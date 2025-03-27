@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New User | Fair Surveying & Mapping Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="../../../images/logo.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="logo-text">FSMC Admin</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="../../index.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle active">
+                            <span class="nav-icon"><i class="fas fa-users"></i></span>
+                            <span class="nav-text">Users</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown open" style="height: auto;">
+                            <a href="all-users.html" class="dropdown-item">All Users</a>
+                            <a href="add-user.html" class="dropdown-item">Add User</a>
+                            <a href="user-roles.html" class="dropdown-item">User Roles</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="nav-text">Services</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../services/all-services.html" class="dropdown-item">All Services</a>
+                            <a href="../services/add-service.html" class="dropdown-item">Add Service</a>
+                            <a href="../services/service-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="nav-text">Products</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../products/all-products.html" class="dropdown-item">All Products</a>
+                            <a href="../products/add-product.html" class="dropdown-item">Add Product</a>
+                            <a href="../products/product-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-book"></i></span>
+                            <span class="nav-text">Trainings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../trainings/all-trainings.html" class="dropdown-item">All Trainings</a>
+                            <a href="../trainings/add-training.html" class="dropdown-item">Add Training</a>
+                            <a href="../trainings/categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                            <span class="nav-text">Research</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../research/all-research.html" class="dropdown-item">All Research</a>
+                            <a href="../research/add-research.html" class="dropdown-item">Add Research</a>
+                            <a href="../research/publications.html" class="dropdown-item">Publications</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="nav-text">Messages</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../messages/inbox.html" class="dropdown-item">Inbox</a>
+                            <a href="../messages/sent.html" class="dropdown-item">Sent</a>
+                            <a href="../messages/templates.html" class="dropdown-item">Templates</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="../analytics.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                            <span class="nav-text">Settings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../settings/general.html" class="dropdown-item">General</a>
+                            <a href="../settings/appearance.html" class="dropdown-item">Appearance</a>
+                            <a href="../settings/notifications.html" class="dropdown-item">Notifications</a>
+                            <a href="../settings/security.html" class="dropdown-item">Security</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Header -->
+        <header class="admin-header">
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="header-title">Add New User</div>
+            
+            <div class="header-controls">
+                <div class="notifications">
+                    <button class="btn-icon btn-light">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge badge-danger" style="position: absolute; top: -5px; right: -5px; font-size: 10px; padding: 2px 5px;">3</span>
+                    </button>
+                </div>
+                
+                <div class="admin-user">
+                    <div class="user-dropdown">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-name">Admin</div>
+                        <i class="fas fa-chevron-down"></i>
+                        
+                        <div class="user-menu">
+                            <a href="../profile.html" class="user-menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="../settings/account.html" class="user-menu-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="../../../pages/login.html" class="user-menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="admin-main animate-fadeIn">
+            <div class="d-flex justify-between align-center mb-4">
+                <h1 class="mt-0 mb-0">Add New User</h1>
+                <a href="all-users.html" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Back to Users
+                </a>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">User Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addUserForm">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label for="firstName" class="form-label">First Name*</label>
+                                    <input type="text" id="firstName" name="firstName" class="form-control" placeholder="Enter first name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="lastName" class="form-label">Last Name*</label>
+                                    <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Enter last name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address*</label>
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter phone number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="role" class="form-label">User Role*</label>
+                                    <select id="role" name="role" class="form-select" required>
+                                        <option value="">Select a role</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="staff">Staff</option>
+                                        <option value="customer">Customer</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select id="status" name="status" class="form-select">
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="pending">Pending</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password" class="form-label">Password*</label>
+                                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirmPassword" class="form-label">Confirm Password*</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">User Permissions</label>
+                                    <div class="d-flex flex-column gap-2 mt-2">
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="view_dashboard">
+                                                <span>View Dashboard</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="manage_users">
+                                                <span>Manage Users</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="manage_services">
+                                                <span>Manage Services</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="manage_products">
+                                                <span>Manage Products</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="manage_trainings">
+                                                <span>Manage Trainings</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="manage_research">
+                                                <span>Manage Research</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="permissions[]" value="view_analytics">
+                                                <span>View Analytics</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title">Profile Picture</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="user-profile-upload">
+                                            <div class="profile-image-preview text-center mb-3">
+                                                <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+                                                <button type="button" id="browseProfileBtn" class="btn btn-secondary btn-sm">
+                                                    <i class="fas fa-upload"></i> Upload Image
+                                                </button>
+                                                <p class="text-gray mt-2" style="font-size: 0.85rem;">JPG, PNG or GIF (Max 2MB)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h6 class="card-title">Additional Options</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="sendWelcomeEmail" checked>
+                                                <span>Send welcome email</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="d-flex align-center gap-2">
+                                                <input type="checkbox" name="requirePasswordChange">
+                                                <span>Require password change on first login</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Enter notes about this user"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-between mt-4">
+                            <button type="button" class="btn btn-light" id="resetBtn">
+                                <i class="fas fa-undo"></i> Reset Form
+                            </button>
+                            <div>
+                                <button type="button" class="btn btn-secondary mr-2" id="saveAsDraft">
+                                    <i class="fas fa-save"></i> Save as Draft
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus"></i> Create User
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container"></div>
+    
+    <!-- Admin JavaScript -->
+    <script src="../../js/admin.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Profile image upload handling
+            const browseProfileBtn = document.getElementById('browseProfileBtn');
+            const profileImage = document.getElementById('profileImage');
+            
+            browseProfileBtn.addEventListener('click', function() {
+                profileImage.click();
+            });
+            
+            profileImage.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewArea = document.querySelector('.profile-image-preview');
+                        previewArea.innerHTML = `
+                            <div style="width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; overflow: hidden;">
+                                <img src="${e.target.result}" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <button type="button" id="removeImageBtn" class="btn btn-sm btn-danger mt-2">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        `;
+                        
+                        // Add event listener to the remove button
+                        document.getElementById('removeImageBtn').addEventListener('click', function() {
+                            profileImage.value = '';
+                            previewArea.innerHTML = `
+                                <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
+                                </div>
+                            `;
+                        });
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Form submission
+            const addUserForm = document.getElementById('addUserForm');
+            
+            addUserForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate form
+                if (!validateForm('addUserForm')) {
+                    showNotification('Please fill in all required fields.', 'error');
+                    return;
+                }
+                
+                // Check if passwords match
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    showNotification('Passwords do not match.', 'error');
+                    document.getElementById('confirmPassword').classList.add('is-invalid');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = addUserForm.querySelector('[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Simulate form submission (in a real app, this would be an AJAX call)
+                setTimeout(function() {
+                    // Reset form
+                    addUserForm.reset();
+                    
+                    // Reset profile image preview
+                    const previewArea = document.querySelector('.profile-image-preview');
+                    previewArea.innerHTML = `
+                        <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
+                        </div>
+                    `;
+                    
+                    // Show success notification
+                    showNotification('User created successfully!', 'success');
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }, 1500);
+            });
+            
+            // Reset form button
+            const resetBtn = document.getElementById('resetBtn');
+            resetBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+                    addUserForm.reset();
+                    
+                    // Reset profile image preview
+                    const previewArea = document.querySelector('.profile-image-preview');
+                    previewArea.innerHTML = `
+                        <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Save as draft button
+            const saveAsDraft = document.getElementById('saveAsDraft');
+            saveAsDraft.addEventListener('click', function() {
+                showNotification('User saved as draft.', 'success');
+            });
+            
+            // Auto-select permissions based on role
+            const roleSelect = document.getElementById('role');
+            const permissionCheckboxes = document.querySelectorAll('input[name="permissions[]"]');
+            
+            roleSelect.addEventListener('change', function() {
+                const role = this.value;
+                
+                // Reset all permissions
+                permissionCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Set permissions based on role
+                if (role === 'admin') {
+                    // Admins get all permissions
+                    permissionCheckboxes.forEach(checkbox => {
+                        checkbox.checked = true;
+                    });
+                } else if (role === 'staff') {
+                    // Staff get limited permissions
+                    const staffPermissions = ['view_dashboard', 'manage_services', 'manage_products', 'view_analytics'];
+                    
+                    permissionCheckboxes.forEach(checkbox => {
+                        if (staffPermissions.includes(checkbox.value)) {
+                            checkbox.checked = true;
+                        }
+                    });
+                } else if (role === 'customer') {
+                    // Customers get minimal permissions
+                    const customerPermissions = ['view_dashboard'];
+                    
+                    permissionCheckboxes.forEach(checkbox => {
+                        if (customerPermissions.includes(checkbox.value)) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

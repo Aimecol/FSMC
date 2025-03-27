@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appearance Settings | Fair Surveying & Mapping Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="../../../images/logo.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="logo-text">FSMC Admin</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="../../index.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-users"></i></span>
+                            <span class="nav-text">Users</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../users/all-users.html" class="dropdown-item">All Users</a>
+                            <a href="../users/add-user.html" class="dropdown-item">Add User</a>
+                            <a href="../users/user-roles.html" class="dropdown-item">User Roles</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="nav-text">Services</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../services/all-services.html" class="dropdown-item">All Services</a>
+                            <a href="../services/add-service.html" class="dropdown-item">Add Service</a>
+                            <a href="../services/service-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="nav-text">Products</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../products/all-products.html" class="dropdown-item">All Products</a>
+                            <a href="../products/add-product.html" class="dropdown-item">Add Product</a>
+                            <a href="../products/product-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-book"></i></span>
+                            <span class="nav-text">Trainings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../trainings/all-trainings.html" class="dropdown-item">All Trainings</a>
+                            <a href="../trainings/add-training.html" class="dropdown-item">Add Training</a>
+                            <a href="../trainings/categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                            <span class="nav-text">Research</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../research/all-research.html" class="dropdown-item">All Research</a>
+                            <a href="../research/add-research.html" class="dropdown-item">Add Research</a>
+                            <a href="../research/publications.html" class="dropdown-item">Publications</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="nav-text">Messages</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../messages/inbox.html" class="dropdown-item">Inbox</a>
+                            <a href="../messages/sent.html" class="dropdown-item">Sent</a>
+                            <a href="../messages/templates.html" class="dropdown-item">Templates</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="../analytics.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle active">
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                            <span class="nav-text">Settings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown open" style="height: auto;">
+                            <a href="general.html" class="dropdown-item">General</a>
+                            <a href="appearance.html" class="dropdown-item">Appearance</a>
+                            <a href="notifications.html" class="dropdown-item">Notifications</a>
+                            <a href="security.html" class="dropdown-item">Security</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Appearance Settings</h1>
+                    <p class="page-subtitle">Customize the look and feel of your website.</p>
+                </div>
+            </div>
+            
+            <!-- Appearance Settings -->
+            <div class="row">
+                <!-- Theme Settings -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">Theme Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Theme Mode</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="themeMode" id="lightMode" checked>
+                                            <label class="form-check-label" for="lightMode">
+                                                Light
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="themeMode" id="darkMode">
+                                            <label class="form-check-label" for="darkMode">
+                                                Dark
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="themeMode" id="autoMode">
+                                            <label class="form-check-label" for="autoMode">
+                                                Auto (Follow System)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="primaryColor" class="form-label">Primary Color</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" class="form-color-input" id="primaryColor" value="#1a5276">
+                                        <input type="text" class="form-control" value="#1a5276" style="width: 100px;">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="secondaryColor" class="form-label">Secondary Color</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" class="form-color-input" id="secondaryColor" value="#2980b9">
+                                        <input type="text" class="form-control" value="#2980b9" style="width: 100px;">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Save Theme Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Settings -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">Logo Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="siteLogo" class="form-label">Site Logo</label>
+                                    <div class="d-flex flex-column">
+                                        <div class="logo-preview mb-2 text-center">
+                                            <img src="../../../images/logo.png" alt="Site Logo" style="max-height: 100px;">
+                                        </div>
+                                        <input class="form-control" type="file" id="siteLogo">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="favicon" class="form-label">Favicon</label>
+                                    <div class="d-flex flex-column">
+                                        <div class="logo-preview mb-2 text-center">
+                                            <img src="../../../images/logo.png" alt="Favicon" style="max-height: 32px;">
+                                        </div>
+                                        <input class="form-control" type="file" id="favicon">
+                                        <small class="form-text text-muted">Recommended size: 32x32 pixels</small>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Update Logo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layout Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Layout Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Navigation Style</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="navStyle" id="verticalNav" checked>
+                                    <label class="form-check-label" for="verticalNav">
+                                        Vertical Sidebar
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="navStyle" id="horizontalNav">
+                                    <label class="form-check-label" for="horizontalNav">
+                                        Horizontal Top Bar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Sidebar Width</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sidebarWidth" id="normalWidth" checked>
+                                    <label class="form-check-label" for="normalWidth">
+                                        Normal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sidebarWidth" id="compactWidth">
+                                    <label class="form-check-label" for="compactWidth">
+                                        Compact
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sidebarWidth" id="expandedWidth">
+                                    <label class="form-check-label" for="expandedWidth">
+                                        Expanded
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contentWidth" class="form-label">Content Width</label>
+                            <select class="form-select" id="contentWidth">
+                                <option value="fluid" selected>Fluid (Full Width)</option>
+                                <option value="fixed">Fixed Width (1200px)</option>
+                                <option value="narrow">Narrow (980px)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Layout Settings</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container"></div>
+    
+    <!-- JavaScript Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Admin JavaScript -->
+    <script src="../../js/admin.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Handle form submissions
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Show success notification
+                showNotification('Appearance settings saved successfully!', 'success');
+            });
+            
+            // Update color input text when color picker changes
+            $('.form-color-input').on('input', function() {
+                $(this).next().val($(this).val());
+            });
+            
+            // Update color picker when text input changes
+            $('.form-color-input').next().on('input', function() {
+                $(this).prev().val($(this).val());
+            });
+        });
+    </script>
+</body>
+</html> 

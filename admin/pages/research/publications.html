@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Research Publications | Fair Surveying & Mapping Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="../../../images/logo.png" />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- DataTables -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"
+    />
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../../css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <div class="logo-text">FSMC Admin</div>
+        </div>
+
+        <nav class="nav-menu">
+          <ul>
+            <li class="nav-item">
+              <a href="../../index.html" class="nav-link">
+                <span class="nav-icon"
+                  ><i class="fas fa-tachometer-alt"></i
+                ></span>
+                <span class="nav-text">Dashboard</span>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-users"></i></span>
+                <span class="nav-text">Users</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../users/all-users.html" class="dropdown-item"
+                  >All Users</a
+                >
+                <a href="../users/add-user.html" class="dropdown-item"
+                  >Add User</a
+                >
+                <a href="../users/user-roles.html" class="dropdown-item"
+                  >User Roles</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                <span class="nav-text">Services</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../services/all-services.html" class="dropdown-item"
+                  >All Services</a
+                >
+                <a href="../services/add-service.html" class="dropdown-item"
+                  >Add Service</a
+                >
+                <a
+                  href="../services/service-categories.html"
+                  class="dropdown-item"
+                  >Categories</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-box"></i></span>
+                <span class="nav-text">Products</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../products/all-products.html" class="dropdown-item"
+                  >All Products</a
+                >
+                <a href="../products/add-product.html" class="dropdown-item"
+                  >Add Product</a
+                >
+                <a
+                  href="../products/product-categories.html"
+                  class="dropdown-item"
+                  >Categories</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-book"></i></span>
+                <span class="nav-text">Trainings</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../trainings/all-trainings.html" class="dropdown-item"
+                  >All Trainings</a
+                >
+                <a href="../trainings/add-training.html" class="dropdown-item"
+                  >Add Training</a
+                >
+                <a href="../trainings/categories.html" class="dropdown-item"
+                  >Categories</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle active">
+                <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                <span class="nav-text">Research</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown open" style="height: auto">
+                <a href="all-research.html" class="dropdown-item"
+                  >All Research</a
+                >
+                <a href="add-research.html" class="dropdown-item"
+                  >Add Research</a
+                >
+                <a href="publications.html" class="dropdown-item"
+                  >Publications</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                <span class="nav-text">Messages</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../messages/inbox.html" class="dropdown-item">Inbox</a>
+                <a href="../messages/sent.html" class="dropdown-item">Sent</a>
+                <a href="../messages/templates.html" class="dropdown-item"
+                  >Templates</a
+                >
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a href="../analytics.html" class="nav-link">
+                <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                <span class="nav-text">Analytics</span>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="#" class="nav-link nav-dropdown-toggle">
+                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                <span class="nav-text">Settings</span>
+                <span class="nav-arrow"
+                  ><i class="fas fa-chevron-right"></i
+                ></span>
+              </a>
+              <div class="nav-dropdown">
+                <a href="../settings/general.html" class="dropdown-item"
+                  >General</a
+                >
+                <a href="../settings/appearance.html" class="dropdown-item"
+                  >Appearance</a
+                >
+                <a href="../settings/notifications.html" class="dropdown-item"
+                  >Notifications</a
+                >
+                <a href="../settings/security.html" class="dropdown-item"
+                  >Security</a
+                >
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-main">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Research Publications</h1>
+            <p class="page-subtitle">
+              Manage all published research papers and articles.
+            </p>
+          </div>
+          <div>
+            <button
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#addPublicationModal"
+            >
+              <i class="fas fa-plus"></i> Add Publication
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title">Filter Publications</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap gap-3 justify-between">
+              <div class="d-flex gap-2 flex-wrap">
+                <select class="form-select" id="typeFilter">
+                  <option value="">All Types</option>
+                  <option value="Journal Article">Journal Articles</option>
+                  <option value="Conference Paper">Conference Papers</option>
+                  <option value="Book">Books</option>
+                  <option value="Book Chapter">Book Chapters</option>
+                  <option value="Technical Report">Technical Reports</option>
+                </select>
+                <select class="form-select" id="yearFilter">
+                  <option value="">All Years</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                  <option value="2021">2021</option>
+                  <option value="2020">2020</option>
+                </select>
+                <select class="form-select" id="authorFilter">
+                  <option value="">All Authors</option>
+                </select>
+              </div>
+              <div>
+                <button class="btn btn-secondary" id="resetFilters">
+                  <i class="fas fa-sync-alt"></i> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Publications Table -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">All Publications</h5>
+            <div class="card-tools">
+              <button class="btn btn-light">
+                <i class="fas fa-download"></i> Export
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="publicationsTable" class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      <input type="checkbox" class="form-check-input" />
+                    </th>
+                    <th>Title</th>
+                    <th>Authors</th>
+                    <th>Publication Type</th>
+                    <th>Journal/Conference</th>
+                    <th>Year</th>
+                    <th>DOI/URL</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input" />
+                    </td>
+                    <td>
+                      <div class="fw-bold">
+                        Advanced GIS Techniques for Urban Planning and
+                        Development
+                      </div>
+                    </td>
+                    <td>Smith, J., Doe, J.</td>
+                    <td>Journal Article</td>
+                    <td>Journal of Urban Planning</td>
+                    <td>2023</td>
+                    <td>
+                      <a href="#" class="text-primary">10.1234/jurb.2023.001</a>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-light" title="View">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input" />
+                    </td>
+                    <td>
+                      <div class="fw-bold">
+                        Satellite-based Monitoring of Land Use Changes
+                      </div>
+                    </td>
+                    <td>Green, S., Wilson, R.</td>
+                    <td>Conference Paper</td>
+                    <td>Int'l Conference on Remote Sensing</td>
+                    <td>2022</td>
+                    <td>
+                      <a href="#" class="text-primary"
+                        >https://doi.org/10.5678/icrs.2022.45</a
+                      >
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-light" title="View">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input" />
+                    </td>
+                    <td>
+                      <div class="fw-bold">
+                        Handbook of Modern Surveying Techniques
+                      </div>
+                    </td>
+                    <td>Miller, D., Taylor, L., et al.</td>
+                    <td>Book</td>
+                    <td>GeoPress Publishing</td>
+                    <td>2021</td>
+                    <td>
+                      <a href="#" class="text-primary"
+                        >ISBN: 978-1-234567-89-0</a
+                      >
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-light" title="View">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input" />
+                    </td>
+                    <td>
+                      <div class="fw-bold">
+                        UAV-based Assessment of Coastal Erosion Rates
+                      </div>
+                    </td>
+                    <td>Green, S., Johnson, P.</td>
+                    <td>Journal Article</td>
+                    <td>Coastal Engineering Journal</td>
+                    <td>2022</td>
+                    <td>
+                      <a href="#" class="text-primary">10.3456/cej.2022.12</a>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-light" title="View">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input" />
+                    </td>
+                    <td>
+                      <div class="fw-bold">
+                        Geospatial Technologies for Smart City Infrastructure
+                      </div>
+                    </td>
+                    <td>Miller, D., Taylor, L., Smith, J.</td>
+                    <td>Technical Report</td>
+                    <td>Fair Surveying & Mapping Ltd</td>
+                    <td>2023</td>
+                    <td>
+                      <a href="#" class="text-primary">TR-2023-05</a>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-light" title="View">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5 class="card-title">Bulk Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex gap-2">
+              <select class="form-select" style="max-width: 200px">
+                <option value="">Select Action</option>
+                <option value="export">Export Selected</option>
+                <option value="categorize">Categorize</option>
+                <option value="archive">Archive</option>
+                <option value="delete">Delete</option>
+              </select>
+              <button class="btn btn-secondary">Apply</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Add Publication Modal -->
+    <div class="modal" id="addPublicationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Publication</h5>
+            <button type="button" class="close-btn" data-dismiss="modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addPublicationForm">
+              <div class="mb-3">
+                <label for="pubTitle" class="form-label">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="pubTitle"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="pubAuthors" class="form-label">Authors</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="pubAuthors"
+                  placeholder="Last name, First initial., etc."
+                  required
+                />
+                <small class="form-text text-muted"
+                  >Format: Last name, First initial., Second Author, etc.</small
+                >
+              </div>
+              <div class="mb-3">
+                <label for="pubType" class="form-label">Publication Type</label>
+                <select class="form-select" id="pubType" required>
+                  <option value="">Select Type</option>
+                  <option value="Journal Article">Journal Article</option>
+                  <option value="Conference Paper">Conference Paper</option>
+                  <option value="Book">Book</option>
+                  <option value="Book Chapter">Book Chapter</option>
+                  <option value="Technical Report">Technical Report</option>
+                  <option value="White Paper">White Paper</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="pubVenue" class="form-label"
+                  >Journal/Conference/Publisher</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="pubVenue"
+                  required
+                />
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="pubYear" class="form-label">Year</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="pubYear"
+                    min="1900"
+                    max="2099"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="pubVolume" class="form-label">Volume/Issue</label>
+                  <input type="text" class="form-control" id="pubVolume" />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="pubPages" class="form-label">Pages</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="pubPages"
+                  placeholder="e.g., 123-145"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="pubDoi" class="form-label">DOI/URL/ISBN</label>
+                <input type="text" class="form-control" id="pubDoi" />
+              </div>
+              <div class="mb-3">
+                <label for="pubAbstract" class="form-label">Abstract</label>
+                <textarea
+                  class="form-control"
+                  id="pubAbstract"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="pubKeywords" class="form-label">Keywords</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="pubKeywords"
+                  placeholder="e.g., GIS, Remote Sensing, Urban Planning"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="pubFile" class="form-label">Upload PDF</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="pubFile"
+                  accept=".pdf"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="pubRelatedProject" class="form-label"
+                  >Related Research Project</label
+                >
+                <select class="form-select" id="pubRelatedProject">
+                  <option value="">None</option>
+                  <option value="RES-2023-001">
+                    GIS Applications in Urban Planning
+                  </option>
+                  <option value="RES-2023-002">
+                    3D Mapping of Historical Sites
+                  </option>
+                  <option value="RES-2023-003">
+                    Precision Agriculture Using Satellite Data
+                  </option>
+                  <option value="RES-2023-004">
+                    Coastal Erosion Assessment Using UAVs
+                  </option>
+                  <option value="RES-2023-005">
+                    Smart City Mapping Solutions
+                  </option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="savePublication">
+              Save Publication
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container"></div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Admin JavaScript -->
+    <script src="../../js/admin.js"></script>
+
+    <script>
+      // Initialize DataTable
+      $(document).ready(function () {
+        $("#publicationsTable").DataTable({
+          responsive: true,
+          pageLength: 10,
+          lengthMenu: [5, 10, 25, 50],
+          language: {
+            search: "",
+            searchPlaceholder: "Search publications...",
+          },
+        });
+
+        // Modal functionality
+        const addPublicationModal = document.getElementById(
+          "addPublicationModal"
+        );
+        const closeButtons = document.querySelectorAll(
+          '[data-dismiss="modal"]'
+        );
+        const savePublication = document.getElementById("savePublication");
+        const addButton = document.querySelector(
+          '[data-target="#addPublicationModal"]'
+        );
+
+        if (addButton) {
+          addButton.addEventListener("click", function () {
+            addPublicationModal.style.display = "block";
+            document.body.style.overflow = "hidden"; // Prevent scrolling
+          });
+        }
+
+        closeButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            addPublicationModal.style.display = "none";
+            document.body.style.overflow = "auto"; // Allow scrolling
+          });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener("click", function (event) {
+          if (event.target === addPublicationModal) {
+            addPublicationModal.style.display = "none";
+            document.body.style.overflow = "auto"; // Allow scrolling
+          }
+        });
+
+        // Save publication
+        if (savePublication) {
+          savePublication.addEventListener("click", function () {
+            const form = document.getElementById("addPublicationForm");
+            const formElements = form.querySelectorAll(
+              "input[required], select[required], textarea[required]"
+            );
+
+            let valid = true;
+            formElements.forEach((element) => {
+              if (!element.value.trim()) {
+                element.classList.add("is-invalid");
+                valid = false;
+              } else {
+                element.classList.remove("is-invalid");
+              }
+            });
+
+            if (!valid) {
+              showNotification("Please fill out all required fields", "error");
+              return;
+            }
+
+            // Show loading state
+            savePublication.disabled = true;
+            savePublication.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Simulate form submission (in a real app, this would be an AJAX call)
+            setTimeout(function () {
+              // Reset form
+              form.reset();
+
+              // Close modal
+              addPublicationModal.style.display = "none";
+              document.body.style.overflow = "auto"; // Allow scrolling
+
+              // Show success notification
+              showNotification("Publication added successfully!", "success");
+
+              // Reset button state
+              savePublication.disabled = false;
+              savePublication.innerHTML = "Save Publication";
+            }, 1000);
+          });
+        }
+
+        // Initialize delete confirmation modals
+        const deleteButtons = document.querySelectorAll(".btn-danger");
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (
+              confirm(
+                "Are you sure you want to delete this publication? This action cannot be undone."
+              )
+            ) {
+              showNotification("Publication deleted successfully!", "success");
+            }
+          });
+        });
+
+        // Filter dropdowns
+        const filterBtns = document.querySelectorAll(".dropdown button");
+        const filterMenus = document.querySelectorAll(".dropdown-menu");
+
+        filterBtns.forEach((btn, index) => {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+
+            // Close all open menus first
+            filterMenus.forEach((menu) => {
+              menu.style.display = "none";
+            });
+
+            // Open the clicked menu
+            filterMenus[index].style.display = "block";
+          });
+        });
+
+        document.addEventListener("click", function () {
+          filterMenus.forEach((menu) => {
+            menu.style.display = "none";
+          });
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function () {
+        // Initialize DataTable with export buttons
+        const table = $("#publicationsTable").DataTable({
+          dom: "Bfrtip",
+          buttons: [
+            {
+              extend: "collection",
+              text: '<i class="fas fa-download"></i> Export',
+              buttons: ["copy", "excel", "pdf", "csv"],
+            },
+          ],
+          responsive: true,
+          order: [[4, "desc"]], // Sort by year descending
+          pageLength: 10,
+          language: {
+            search: "",
+            searchPlaceholder: "Search publications...",
+          },
+        });
+
+        // Filter functionality
+        $("#typeFilter, #yearFilter, #authorFilter").on("change", function () {
+          const type = $("#typeFilter").val();
+          const year = $("#yearFilter").val();
+          const author = $("#authorFilter").val();
+
+          table
+            .columns(3)
+            .search(type) // Type column
+            .columns(4)
+            .search(year) // Year column
+            .columns(2)
+            .search(author) // Author column
+            .draw();
+        });
+
+        // Reset filters
+        $("#resetFilters").click(function () {
+          $("#typeFilter, #yearFilter, #authorFilter").val("");
+          table.search("").columns().search("").draw();
+        });
+
+        // Populate authors filter from table data
+        const authors = new Set();
+        table
+          .column(2)
+          .data()
+          .each(function (value) {
+            value.split(", ").forEach((author) => authors.add(author.trim()));
+          });
+        authors.forEach((author) => {
+          $("#authorFilter").append(
+            `<option value="${author}">${author}</option>`
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

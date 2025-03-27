@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Categories | Fair Surveying & Mapping Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="../../../images/logo.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="logo-text">FSMC Admin</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="../../index.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-users"></i></span>
+                            <span class="nav-text">Users</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../users/all-users.html" class="dropdown-item">All Users</a>
+                            <a href="../users/add-user.html" class="dropdown-item">Add User</a>
+                            <a href="../users/user-roles.html" class="dropdown-item">User Roles</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="nav-text">Services</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../services/all-services.html" class="dropdown-item">All Services</a>
+                            <a href="../services/add-service.html" class="dropdown-item">Add Service</a>
+                            <a href="../services/service-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle active">
+                            <span class="nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="nav-text">Products</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown open" style="height: auto;">
+                            <a href="all-products.html" class="dropdown-item">All Products</a>
+                            <a href="add-product.html" class="dropdown-item">Add Product</a>
+                            <a href="product-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-book"></i></span>
+                            <span class="nav-text">Trainings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../trainings/all-trainings.html" class="dropdown-item">All Trainings</a>
+                            <a href="../trainings/add-training.html" class="dropdown-item">Add Training</a>
+                            <a href="../trainings/categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                            <span class="nav-text">Research</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../research/all-research.html" class="dropdown-item">All Research</a>
+                            <a href="../research/add-research.html" class="dropdown-item">Add Research</a>
+                            <a href="../research/publications.html" class="dropdown-item">Publications</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="nav-text">Messages</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../messages/inbox.html" class="dropdown-item">Inbox</a>
+                            <a href="../messages/sent.html" class="dropdown-item">Sent</a>
+                            <a href="../messages/templates.html" class="dropdown-item">Templates</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="../analytics.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                            <span class="nav-text">Settings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="../settings/general.html" class="dropdown-item">General</a>
+                            <a href="../settings/appearance.html" class="dropdown-item">Appearance</a>
+                            <a href="../settings/notifications.html" class="dropdown-item">Notifications</a>
+                            <a href="../settings/security.html" class="dropdown-item">Security</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Header -->
+        <header class="admin-header">
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="header-title">Product Categories</div>
+            
+            <div class="header-controls">
+                <div class="notifications">
+                    <button class="btn-icon btn-light">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge badge-danger" style="position: absolute; top: -5px; right: -5px; font-size: 10px; padding: 2px 5px;">3</span>
+                    </button>
+                </div>
+                
+                <div class="admin-user">
+                    <div class="user-dropdown">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-name">Admin</div>
+                        <i class="fas fa-chevron-down"></i>
+                        
+                        <div class="user-menu">
+                            <a href="../profile.html" class="user-menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="../settings/account.html" class="user-menu-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="../../../pages/login.html" class="user-menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="admin-main animate-fadeIn">
+            <div class="d-flex justify-between align-center mb-4">
+                <h1 class="mt-0 mb-0">Product Categories</h1>
+                <button class="btn btn-primary" id="addCategoryBtn">
+                    <i class="fas fa-plus"></i> Add New Category
+                </button>
+            </div>
+            
+            <!-- Categories Grid -->
+            <div class="dashboard-grid">
+                <!-- GPS Equipment -->
+                <div class="card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-satellite"></i>
+                                <h5 class="card-title mb-0">GPS Equipment</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 15</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-primary text-white">
+                                <i class="fas fa-satellite"></i>
+                            </div>
+                        </div>
+                        <p>Professional GPS equipment for surveying and mapping.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=gps-equipment" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Software -->
+                <div class="card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-header bg-info text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-laptop-code"></i>
+                                <h5 class="card-title mb-0">Software</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 8</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-info text-white">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                        </div>
+                        <p>Specialized software solutions for data processing and analysis.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=software" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Measurement Tools -->
+                <div class="card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-ruler-combined"></i>
+                                <h5 class="card-title mb-0">Measurement Tools</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 12</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-success text-white">
+                                <i class="fas fa-ruler-combined"></i>
+                            </div>
+                        </div>
+                        <p>Precision measurement tools for accurate surveying and mapping.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=measurement-tools" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Survey Equipment -->
+                <div class="card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-header bg-warning text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-compass"></i>
+                                <h5 class="card-title mb-0">Survey Equipment</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 9</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-warning text-white">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                        </div>
+                        <p>Essential equipment for professional surveying operations.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=survey-equipment" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drones -->
+                <div class="card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="card-header bg-secondary text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-drone"></i>
+                                <h5 class="card-title mb-0">Drones</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 5</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-secondary text-white">
+                                <i class="fas fa-drone"></i>
+                            </div>
+                        </div>
+                        <p>Aerial surveying drones with advanced imaging capabilities.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=drones" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Safety Equipment -->
+                <div class="card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="card-header bg-danger text-white">
+                        <div class="d-flex justify-between align-center">
+                            <div class="d-flex align-center gap-2">
+                                <i class="fas fa-hard-hat"></i>
+                                <h5 class="card-title mb-0">Safety Equipment</h5>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn-icon btn-sm text-white" style="background: transparent;">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" style="display: none;">
+                                    <a href="#" class="dropdown-item edit-category">Edit</a>
+                                    <a href="#" class="dropdown-item text-danger delete-category">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-between mb-3">
+                            <div>
+                                <div class="mb-2"><strong>Products:</strong> 7</div>
+                                <div><strong>Status:</strong> <span class="badge badge-success">Active</span></div>
+                            </div>
+                            <div class="category-icon bg-danger text-white">
+                                <i class="fas fa-hard-hat"></i>
+                            </div>
+                        </div>
+                        <p>Essential safety gear for surveying and fieldwork professionals.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-between">
+                            <a href="all-products.html?category=safety-equipment" class="btn btn-sm btn-light">View Products</a>
+                            <button class="btn btn-sm btn-secondary edit-category">Edit Category</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add/Edit Category Modal -->
+    <div id="categoryModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Category</h4>
+                <button type="button" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <div class="form-group mb-3">
+                        <label for="categoryName" class="form-label">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="categoryIcon" class="form-label">Icon</label>
+                        <select class="form-select" id="categoryIcon" required>
+                            <option value="fa-satellite">Satellite</option>
+                            <option value="fa-laptop-code">Laptop Code</option>
+                            <option value="fa-ruler-combined">Ruler</option>
+                            <option value="fa-compass">Compass</option>
+                            <option value="fa-drone">Drone</option>
+                            <option value="fa-hard-hat">Hard Hat</option>
+                            <option value="fa-book">Book</option>
+                            <option value="fa-tools">Tools</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="categoryColor" class="form-label">Color</label>
+                        <input type="color" class="form-control" id="categoryColor" value="#1a5276" style="height: 40px;">
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="categoryDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="categoryDescription" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="categoryStatus" class="form-label">Status</label>
+                        <select class="form-select" id="categoryStatus" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light close-modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCategory">Save Category</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container"></div>
+    
+    <!-- Admin JavaScript -->
+    <script src="../../js/admin.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal functionality
+            const categoryModal = document.getElementById('categoryModal');
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            const editCategoryBtns = document.querySelectorAll('.edit-category');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            const modalTitle = document.querySelector('.modal-title');
+            
+            // Open modal for adding
+            addCategoryBtn.addEventListener('click', function() {
+                modalTitle.textContent = 'Add New Category';
+                categoryModal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+                document.getElementById('categoryForm').reset();
+            });
+            
+            // Open modal for editing
+            editCategoryBtns.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    modalTitle.textContent = 'Edit Category';
+                    categoryModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling
+                    
+                    // Get category data from the card
+                    const card = this.closest('.card');
+                    const categoryName = card.querySelector('.card-title').textContent;
+                    const categoryDescription = card.querySelector('p').textContent;
+                    const categoryIcon = card.querySelector('.category-icon i').className.split(' ')[1];
+                    const headerColor = getComputedStyle(card.querySelector('.card-header')).backgroundColor;
+                    
+                    // Fill form with data
+                    document.getElementById('categoryName').value = categoryName;
+                    document.getElementById('categoryDescription').value = categoryDescription;
+                    document.getElementById('categoryIcon').value = categoryIcon;
+                    document.getElementById('categoryColor').value = rgbToHex(headerColor);
+                    
+                    // Set status based on badge
+                    const statusBadge = card.querySelector('.badge');
+                    document.getElementById('categoryStatus').value = statusBadge.classList.contains('badge-success') ? 'active' : 'inactive';
+                });
+            });
+            
+            // Close modal
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    categoryModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Allow scrolling
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === categoryModal) {
+                    categoryModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Allow scrolling
+                }
+            });
+            
+            // Save category
+            const saveCategory = document.getElementById('saveCategory');
+            
+            saveCategory.addEventListener('click', function() {
+                const categoryForm = document.getElementById('categoryForm');
+                
+                // Validate form
+                if (!validateForm('categoryForm')) {
+                    showNotification('Please fill in all required fields.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                saveCategory.disabled = true;
+                saveCategory.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // Simulate form submission (in a real app, this would be an AJAX call)
+                setTimeout(function() {
+                    // Reset form
+                    categoryForm.reset();
+                    
+                    // Close modal
+                    categoryModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Allow scrolling
+                    
+                    // Show success notification
+                    const action = modalTitle.textContent.includes('Add') ? 'created' : 'updated';
+                    showNotification(`Category ${action} successfully!`, 'success');
+                    
+                    // Reset button state
+                    saveCategory.disabled = false;
+                    saveCategory.innerHTML = 'Save Category';
+                }, 1000);
+            });
+            
+            // Delete category functionality
+            const deleteButtons = document.querySelectorAll('.delete-category');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.card');
+                    const categoryName = card.querySelector('.card-title').textContent;
+                    
+                    if (confirm(`Are you sure you want to delete the "${categoryName}" category? This will affect all associated products.`)) {
+                        // Add fade-out animation
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.9)';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                            showNotification('Category deleted successfully!', 'success');
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Dropdown menu functionality
+            const dropdownButtons = document.querySelectorAll('.card .dropdown button');
+            
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const menu = this.nextElementSibling;
+                    
+                    // Close all other open menus
+                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+                        if (m !== menu) m.style.display = 'none';
+                    });
+                    
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            });
+            
+            // Helper function to convert RGB to Hex
+            function rgbToHex(rgb) {
+                // Extract RGB values
+                const rgbMatch = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                if (!rgbMatch) return '#1a5276'; // Default color
+                
+                function hex(x) {
+                    return ("0" + parseInt(x).toString(16)).slice(-2);
+                }
+                
+                return "#" + hex(rgbMatch[1]) + hex(rgbMatch[2]) + hex(rgbMatch[3]);
+            }
+            
+            // Add animation to cards
+            document.querySelectorAll('.card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+    
+    <style>
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-out;
+        }
+    </style>
+</body>
+</html> 

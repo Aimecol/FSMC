@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Fair Surveying & Mapping Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="../../images/logo.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="logo-text">FSMC Admin</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-users"></i></span>
+                            <span class="nav-text">Users</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="users/all-users.html" class="dropdown-item">All Users</a>
+                            <a href="users/add-user.html" class="dropdown-item">Add User</a>
+                            <a href="users/user-roles.html" class="dropdown-item">User Roles</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="nav-text">Services</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="services/all-services.html" class="dropdown-item">All Services</a>
+                            <a href="services/add-service.html" class="dropdown-item">Add Service</a>
+                            <a href="services/service-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-box"></i></span>
+                            <span class="nav-text">Products</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="products/all-products.html" class="dropdown-item">All Products</a>
+                            <a href="products/add-product.html" class="dropdown-item">Add Product</a>
+                            <a href="products/product-categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-book"></i></span>
+                            <span class="nav-text">Trainings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="trainings/all-trainings.html" class="dropdown-item">All Trainings</a>
+                            <a href="trainings/add-training.html" class="dropdown-item">Add Training</a>
+                            <a href="trainings/categories.html" class="dropdown-item">Categories</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                            <span class="nav-text">Research</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="research/all-research.html" class="dropdown-item">All Research</a>
+                            <a href="research/add-research.html" class="dropdown-item">Add Research</a>
+                            <a href="research/publications.html" class="dropdown-item">Publications</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="nav-text">Messages</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="messages/inbox.html" class="dropdown-item">Inbox</a>
+                            <a href="messages/sent.html" class="dropdown-item">Sent</a>
+                            <a href="messages/templates.html" class="dropdown-item">Templates</a>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="analytics.html" class="nav-link active">
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                            <span class="nav-text">Analytics</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="#" class="nav-link nav-dropdown-toggle">
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                            <span class="nav-text">Settings</span>
+                            <span class="nav-arrow"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                        <div class="nav-dropdown">
+                            <a href="settings/general.html" class="dropdown-item">General</a>
+                            <a href="settings/appearance.html" class="dropdown-item">Appearance</a>
+                            <a href="settings/notifications.html" class="dropdown-item">Notifications</a>
+                            <a href="settings/security.html" class="dropdown-item">Security</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Analytics Dashboard</h1>
+                    <p class="page-subtitle">Key performance metrics and insights for Fair Surveying & Mapping Ltd.</p>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button class="btn btn-outline">Today</button>
+                        <button class="btn btn-outline active">Week</button>
+                        <button class="btn btn-outline">Month</button>
+                        <button class="btn btn-outline">Quarter</button>
+                        <button class="btn btn-outline">Year</button>
+                        <button class="btn btn-outline"><i class="fas fa-calendar"></i> Custom</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Total Revenue</h6>
+                                <h3 class="mb-0">$128,430</h3>
+                                <div class="text-success mt-1"><i class="fas fa-arrow-up"></i> 12.5% <span class="text-muted">vs. last period</span></div>
+                            </div>
+                            <div class="card-icon bg-primary">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">New Clients</h6>
+                                <h3 class="mb-0">52</h3>
+                                <div class="text-success mt-1"><i class="fas fa-arrow-up"></i> 8.2% <span class="text-muted">vs. last period</span></div>
+                            </div>
+                            <div class="card-icon bg-success">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Projects Completed</h6>
+                                <h3 class="mb-0">28</h3>
+                                <div class="text-danger mt-1"><i class="fas fa-arrow-down"></i> 3.1% <span class="text-muted">vs. last period</span></div>
+                            </div>
+                            <div class="card-icon bg-info">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-1">Customer Satisfaction</h6>
+                                <h3 class="mb-0">94.2%</h3>
+                                <div class="text-success mt-1"><i class="fas fa-arrow-up"></i> 1.8% <span class="text-muted">vs. last period</span></div>
+                            </div>
+                            <div class="card-icon bg-warning">
+                                <i class="fas fa-smile"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Chart -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Revenue Overview</h5>
+                    <div class="card-tools">
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle">
+                                Monthly <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item">Weekly</a>
+                                <a href="#" class="dropdown-item">Monthly</a>
+                                <a href="#" class="dropdown-item">Quarterly</a>
+                                <a href="#" class="dropdown-item">Yearly</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <!-- Service Distribution Chart -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">Service Distribution</h5>
+                            <div class="card-tools">
+                                <button class="btn btn-sm btn-light">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="servicesPieChart" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Products Chart -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">Top Products</h5>
+                            <div class="card-tools">
+                                <button class="btn btn-sm btn-light">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="productsBarChart" height="260"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <!-- Website Traffic -->
+                <div class="col-md-8">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">Website Traffic</h5>
+                            <div class="card-tools">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light dropdown-toggle">
+                                        Last 30 Days <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a href="#" class="dropdown-item">Last 7 Days</a>
+                                        <a href="#" class="dropdown-item">Last 30 Days</a>
+                                        <a href="#" class="dropdown-item">Last Quarter</a>
+                                        <a href="#" class="dropdown-item">Last Year</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="trafficChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Traffic Sources -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">Traffic Sources</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="sourcesDoughnutChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Regional Performance Table -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Regional Performance</h5>
+                    <div class="card-tools">
+                        <button class="btn btn-light">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Region</th>
+                                    <th>Revenue</th>
+                                    <th>Projects</th>
+                                    <th>Clients</th>
+                                    <th>Growth</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Eastern Region</td>
+                                    <td>$45,320</td>
+                                    <td>12</td>
+                                    <td>18</td>
+                                    <td><span class="text-success">+18.4%</span></td>
+                                    <td><span class="badge bg-success">Growing</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Western Region</td>
+                                    <td>$38,450</td>
+                                    <td>8</td>
+                                    <td>15</td>
+                                    <td><span class="text-success">+12.1%</span></td>
+                                    <td><span class="badge bg-success">Growing</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Northern Region</td>
+                                    <td>$18,720</td>
+                                    <td>4</td>
+                                    <td>9</td>
+                                    <td><span class="text-danger">-3.6%</span></td>
+                                    <td><span class="badge bg-warning">Stagnant</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Southern Region</td>
+                                    <td>$25,940</td>
+                                    <td>4</td>
+                                    <td>10</td>
+                                    <td><span class="text-success">+8.2%</span></td>
+                                    <td><span class="badge bg-success">Growing</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container"></div>
+    
+    <!-- JavaScript Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Admin JavaScript -->
+    <script src="../js/admin.js"></script>
+    
+    <script>
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [12500, 15200, 14800, 16300, 18200, 21400, 25800, 23500, 24100, 27500, 29800, 32300],
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [8200, 9300, 9100, 10500, 11200, 12300, 14500, 13800, 14200, 15800, 16500, 17800],
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Services Pie Chart
+            const servicesCtx = document.getElementById('servicesPieChart').getContext('2d');
+            const servicesPieChart = new Chart(servicesCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Surveying', 'Mapping', 'GIS Analysis', 'Remote Sensing', 'LiDAR Services', 'Others'],
+                    datasets: [{
+                        data: [35, 25, 18, 12, 7, 3],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(241, 196, 15, 0.8)',
+                            'rgba(231, 76, 60, 0.8)',
+                            'rgba(155, 89, 182, 0.8)',
+                            'rgba(149, 165, 166, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+            
+            // Products Bar Chart
+            const productsCtx = document.getElementById('productsBarChart').getContext('2d');
+            const productsBarChart = new Chart(productsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['GPS Systems', 'Drones', 'Mapping Software', 'LiDAR Equipment', 'Survey Tools'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [42, 38, 34, 29, 26],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(241, 196, 15, 0.8)',
+                            'rgba(231, 76, 60, 0.8)',
+                            'rgba(155, 89, 182, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Traffic Chart
+            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+            const trafficChart = new Chart(trafficCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '5', '10', '15', '20', '25', '30'],
+                    datasets: [{
+                        label: 'Visitors',
+                        data: [520, 680, 750, 620, 830, 890, 940],
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Sources Doughnut Chart
+            const sourcesCtx = document.getElementById('sourcesDoughnutChart').getContext('2d');
+            const sourcesDoughnutChart = new Chart(sourcesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Direct', 'Search Engines', 'Social Media', 'Referrals', 'Ads'],
+                    datasets: [{
+                        data: [35, 30, 15, 12, 8],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(241, 196, 15, 0.8)',
+                            'rgba(231, 76, 60, 0.8)',
+                            'rgba(155, 89, 182, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            
+            // Filter dropdowns
+            const filterBtns = document.querySelectorAll('.dropdown button');
+            const filterMenus = document.querySelectorAll('.dropdown-menu');
+            
+            filterBtns.forEach((btn, index) => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close all open menus first
+                    filterMenus.forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    
+                    // Open the clicked menu
+                    filterMenus[index].style.display = 'block';
+                });
+            });
+            
+            document.addEventListener('click', function() {
+                filterMenus.forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
