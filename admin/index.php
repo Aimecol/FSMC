@@ -115,10 +115,252 @@ function getRecentActivity() {
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
-        <?php include 'pages/includes/sidebar.php'; ?>
+        <aside class="admin-sidebar">
+          <div class="sidebar-logo">
+              <div class="logo-icon">
+              <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <div class="logo-text">FSMC Admin</div>
+          </div>
 
+          <nav class="nav-menu">
+              <ul>
+              <li class="nav-item">
+                  <a href="./index.php" class="nav-link">
+                  <span class="nav-icon"
+                      ><i class="fas fa-tachometer-alt"></i
+                  ></span>
+                  <span class="nav-text">Dashboard</span>
+                  </a>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-users"></i></span>
+                  <span class="nav-text">Users</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/users/all-users.php" class="dropdown-item">All Users</a>
+                  <a href="./pages/users/add-user.php" class="dropdown-item">Add User</a>
+                  <a href="./pages/users/user-roles.php" class="dropdown-item">User Roles</a>
+                  </div>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-cogs"></i></span>
+                  <span class="nav-text">Services</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/services/all-services.php" class="dropdown-item"
+                      >All Services</a
+                  >
+                  <a href="./pages/services/add-service.php" class="dropdown-item"
+                      >Add Service</a
+                  >
+                  <a
+                      href="./pages/services/service-categories.php"
+                      class="dropdown-item"
+                      >Categories</a
+                  >
+                  </div>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-box"></i></span>
+                  <span class="nav-text">Products</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/products/all-products.php" class="dropdown-item"
+                      >All Products</a
+                  >
+                  <a href="./pages/products/add-product.php" class="dropdown-item"
+                      >Add Product</a
+                  >
+                  <a
+                      href="./pages/products/product-categories.php"
+                      class="dropdown-item"
+                      >Categories</a
+                  >
+                  </div>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-book"></i></span>
+                  <span class="nav-text">Trainings</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/trainings/all-trainings.php" class="dropdown-item"
+                      >All Trainings</a
+                  >
+                  <a href="./pages/trainings/add-training.php" class="dropdown-item"
+                      >Add Training</a
+                  >
+                  <a href="./pages/trainings/categories.php" class="dropdown-item"
+                      >Categories</a
+                  >
+                  </div>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-flask"></i></span>
+                  <span class="nav-text">Research</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/research/all-research.php" class="dropdown-item"
+                      >All Research</a
+                  >
+                  <a href="./pages/research/add-research.php" class="dropdown-item"
+                      >Add Research</a
+                  >
+                  </div>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link nav-dropdown-toggle">
+                  <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+                  <span class="nav-text">Messages</span>
+                  <span class="nav-arrow"
+                      ><i class="fas fa-chevron-right"></i
+                  ></span>
+                  </a>
+                  <div class="nav-dropdown">
+                  <a href="./pages/messages/inbox.php" class="dropdown-item">Inbox</a>
+                  <a href="./pages/messages/sent.php" class="dropdown-item">Sent</a>
+                  </div>
+              </li>
+              </ul>
+          </nav>
+        </aside>
+
+        <?php
+        // Get current user if not already set
+        if (!isset($currentUser)) {
+            $currentUser = getCurrentAdminUser();
+        }
+        ?>
         <!-- Header -->
-        <?php include 'pages/includes/header.php'; ?>
+        <header class="admin-header">
+            <button class="toggle-sidebar" aria-label="Toggle navigation">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+
+            <div class="header-title">
+                <?php
+                $pageTitle = 'Dashboard';
+                if (isset($_GET['page'])) {
+                    $pageTitle = ucfirst($_GET['page']);
+                } else {
+                    $currentPage = basename($_SERVER['PHP_SELF'], '.php');
+                    switch($currentPage) {
+                        case 'all-users':
+                            $pageTitle = 'Users Management';
+                            break;
+                        case 'add-user':
+                            $pageTitle = 'Add User';
+                            break;
+                        case 'all-products':
+                            $pageTitle = 'Products Management';
+                            break;
+                        case 'add-product':
+                            $pageTitle = 'Add Product';
+                            break;
+                        case 'all-services':
+                            $pageTitle = 'Services Management';
+                            break;
+                        case 'add-service':
+                            $pageTitle = 'Add Service';
+                            break;
+                        case 'all-research':
+                            $pageTitle = 'Research Projects';
+                            break;
+                        case 'add-research':
+                            $pageTitle = 'Add Research Project';
+                            break;
+                        case 'all-trainings':
+                            $pageTitle = 'Training Programs';
+                            break;
+                        case 'add-training':
+                            $pageTitle = 'Add Training Program';
+                            break;
+                        case 'inbox':
+                            $pageTitle = 'Messages Inbox';
+                            break;
+                        default:
+                            $pageTitle = 'Dashboard';
+                    }
+                }
+                echo htmlspecialchars($pageTitle);
+                ?>
+            </div>
+
+            <div class="header-controls">
+                <!-- User Dropdown -->
+                <div class="admin-user">
+                    <div class="user-dropdown">
+                        <div class="user-avatar">
+                            <?php if ($currentUser && !empty($currentUser['avatar'])): ?>
+                                <img src="<?php echo htmlspecialchars($currentUser['avatar']); ?>" alt="User Avatar">
+                            <?php else: ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-name">
+                            <?php echo $currentUser ? htmlspecialchars($currentUser['name']) : 'Admin'; ?>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+
+                        <div class="user-menu">
+                            <div class="user-menu-header">
+                                <div class="user-info">
+                                    <div class="user-name"><?php echo $currentUser ? htmlspecialchars($currentUser['name']) : 'Admin'; ?></div>
+                                    <div class="user-email"><?php echo $currentUser ? htmlspecialchars($currentUser['email']) : ''; ?></div>
+                                    <div class="user-role">
+                                        <span class="badge badge-primary">
+                                            <?php echo $currentUser ? htmlspecialchars($currentUser['role']) : 'Admin'; ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="./pages/profile.php" class="user-menu-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="./logout.php" class="user-menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="sidebar-overlay"></div>
 
         <!-- Main Content -->
         <main class="admin-main animate-fadeIn">

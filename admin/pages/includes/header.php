@@ -64,52 +64,6 @@ if (!isset($currentUser)) {
     </div>
 
     <div class="header-controls">
-        <!-- Notifications -->
-        <div class="notification-dropdown">
-            <button class="notification-btn" aria-label="Notifications">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge">3</span>
-            </button>
-            <div class="notification-menu">
-                <div class="notification-header">
-                    <h6>Notifications</h6>
-                    <span class="badge badge-primary">3 New</span>
-                </div>
-                <div class="notification-list">
-                    <div class="notification-item">
-                        <div class="notification-icon bg-primary">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">New user registered</div>
-                            <div class="notification-time">2 minutes ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <div class="notification-icon bg-warning">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">New message received</div>
-                            <div class="notification-time">5 minutes ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <div class="notification-icon bg-success">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-title">Product updated successfully</div>
-                            <div class="notification-time">10 minutes ago</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="notification-footer">
-                    <a href="#" class="btn btn-sm btn-primary">View All</a>
-                </div>
-            </div>
-        </div>
-
         <!-- User Dropdown -->
         <div class="admin-user">
             <div class="user-dropdown">
@@ -141,10 +95,6 @@ if (!isset($currentUser)) {
                     <a href="../profile.php" class="user-menu-item">
                         <i class="fas fa-user-circle"></i>
                         <span>Profile</span>
-                    </a>
-                    <a href="../settings.php" class="user-menu-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="../../logout.php" class="user-menu-item">

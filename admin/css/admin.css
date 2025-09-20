@@ -151,7 +151,7 @@ body {
 /* Main Content */
 .admin-main {
   flex: 1;
-  margin-left: 260px; /* Match sidebar width */
+  padding-left: 260px; /* Match sidebar width */
   margin-top: 70px; /* Match header height */
   padding: 2rem;
   background: var(--bg-secondary);
