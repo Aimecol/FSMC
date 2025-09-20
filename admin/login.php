@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Successful login
                     $_SESSION['admin_logged_in'] = true;
                     $_SESSION['admin_user_id'] = $user['id'];
-                    $_SESSION['admin_user_name'] = $user['name'];
+                    $_SESSION['admin_user_name'] = $user['first_name'] . ' ' . $user['last_name'];
                     $_SESSION['admin_user_email'] = $user['email'];
                     $_SESSION['admin_user_role'] = $user['role'];
                     $_SESSION['login_time'] = time();

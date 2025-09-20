@@ -401,15 +401,4 @@ function verifyPassword($password, $hash) {
     return password_verify($password, $hash);
 }
 
-/**
- * Sanitize input data
- * @param string $data Input data
- * @return string Sanitized data
- */
-function sanitizeInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
 ?>

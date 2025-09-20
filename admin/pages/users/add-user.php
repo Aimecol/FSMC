@@ -1,9 +1,146 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+session_start();
+
+// Include database configuration and functions
+require_once '../../../config/database.php';
+require_once '../../../includes/functions.php';
+
+// Require admin authentication
+requireAdminAuth();
+
+// Get current admin user
+$currentUser = getCurrentAdminUser();
+
+// Initialize variables
+$user = null;
+$isEdit = false;
+$errors = [];
+$success = '';
+
+// Check if editing existing user
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $userId = intval($_GET['id']);
+    $user = getRecordById('users', $userId);
+    if ($user) {
+        $isEdit = true;
+    } else {
+        $errors[] = 'User not found.';
+    }
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate and sanitize input
+    $firstName = sanitizeInput($_POST['first_name'] ?? '');
+    $lastName = sanitizeInput($_POST['last_name'] ?? '');
+    $email = sanitizeInput($_POST['email'] ?? '');
+    $phone = sanitizeInput($_POST['phone'] ?? '');
+    $address = sanitizeInput($_POST['address'] ?? '');
+    $role = sanitizeInput($_POST['role'] ?? 'User');
+    $status = sanitizeInput($_POST['status'] ?? 'Active');
+    $password = $_POST['password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    // Validation
+    if (empty($firstName)) {
+        $errors[] = 'First name is required.';
+    }
+    if (empty($lastName)) {
+        $errors[] = 'Last name is required.';
+    }
+    if (empty($email)) {
+        $errors[] = 'Email address is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address.';
+    }
+
+    // Check for duplicate email (excluding current user if editing)
+    $mysqli = getDatabaseConnection();
+    if ($mysqli) {
+        $emailCheckQuery = "SELECT id FROM users WHERE email = ? " . ($isEdit ? "AND id != $userId" : "");
+        $stmt = $mysqli->prepare($emailCheckQuery);
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $errors[] = 'Email address already exists. Please use a different email.';
+        }
+        $stmt->close();
+    }
+
+    // Password validation (required for new users, optional for editing)
+    if (!$isEdit) {
+        if (empty($password)) {
+            $errors[] = 'Password is required for new users.';
+        } elseif (strlen($password) < 6) {
+            $errors[] = 'Password must be at least 6 characters long.';
+        } elseif ($password !== $confirmPassword) {
+            $errors[] = 'Passwords do not match.';
+        }
+    } else {
+        // For editing, only validate password if provided
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                $errors[] = 'Password must be at least 6 characters long.';
+            } elseif ($password !== $confirmPassword) {
+                $errors[] = 'Passwords do not match.';
+            }
+        }
+    }
+
+    // Handle avatar upload
+    $avatarPath = $isEdit ? $user['avatar'] : '';
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+        $uploadResult = uploadImage($_FILES['avatar'], '../../../uploads/avatars/');
+        if ($uploadResult['success']) {
+            $avatarPath = 'uploads/avatars/' . $uploadResult['filename'];
+        } else {
+            $errors[] = 'Avatar upload failed: ' . $uploadResult['error'];
+        }
+    }
+
+    // If no errors, save the user
+    if (empty($errors)) {
+        $userData = [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address,
+            'role' => $role,
+            'status' => $status,
+            'avatar' => $avatarPath
+        ];
+
+        // Add password to data if provided
+        if (!empty($password)) {
+            $userData['password'] = hashPassword($password);
+        }
+
+        if ($isEdit) {
+            $result = updateRecord('users', $userData, $userId);
+            $success = $result ? 'User updated successfully!' : 'Failed to update user.';
+        } else {
+            $result = insertRecord('users', $userData);
+            $success = $result ? 'User added successfully!' : 'Failed to add user.';
+        }
+
+        if ($result) {
+            // Redirect to users list after successful save
+            header('Location: all-users.php?success=' . urlencode($success));
+            exit;
+        } else {
+            $errors[] = $success;
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New User | Fair Surveying & Mapping Ltd</title>
+    <title><?php echo $isEdit ? 'Edit' : 'Add'; ?> User | Fair Surveying & Mapping Ltd</title>
     <link rel="icon" type="image/svg+xml" href="../../../images/logo.png">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,351 +151,336 @@
     <div class="admin-layout">
         <!-- Sidebar -->
         <?php include '../includes/sidebar.php'; ?>
-        
+
         <!-- Header -->
         <?php include '../includes/header.php'; ?>
-        
-        
+
         <!-- Main Content -->
         <main class="admin-main animate-fadeIn">
             <div class="d-flex justify-between align-center mb-4">
-                <h1 class="mt-0 mb-0">Add New User</h1>
-                <a href="all-users.php" class="btn btn-light">
-                    <i class="fas fa-arrow-left"></i> Back to Users
+                <h1 class="page-title"><?php echo $isEdit ? 'Edit' : 'Add'; ?> User</h1>
+                <a href="all-users.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Users
                 </a>
             </div>
-            
+
+            <!-- Display Messages -->
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?php echo htmlspecialchars($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- User Form -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">User Information</h5>
+                    <h5 class="card-title">
+                        <i class="fas fa-user"></i>
+                        User Information
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <form id="addUserForm">
+                    <form method="POST" enctype="multipart/form-data" id="userForm">
                         <div class="row">
+                            <!-- Basic Information -->
                             <div class="col-lg-8">
-                                <div class="form-group">
-                                    <label for="firstName" class="form-label">First Name*</label>
-                                    <input type="text" id="firstName" name="firstName" class="form-control" placeholder="Enter first name" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="lastName" class="form-label">Last Name*</label>
-                                    <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Enter last name" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="email" class="form-label">Email Address*</label>
-                                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter phone number">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="role" class="form-label">User Role*</label>
-                                    <select id="role" name="role" class="form-select" required>
-                                        <option value="">Select a role</option>
-                                        <option value="admin">Administrator</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="customer">Customer</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select id="status" name="status" class="form-select">
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="pending">Pending</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="password" class="form-label">Password*</label>
-                                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="confirmPassword" class="form-label">Confirm Password*</label>
-                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm password" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">User Permissions</label>
-                                    <div class="d-flex flex-column gap-2 mt-2">
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="view_dashboard">
-                                                <span>View Dashboard</span>
-                                            </label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="first_name"
+                                                   name="first_name"
+                                                   value="<?php echo $user ? htmlspecialchars($user['first_name']) : ''; ?>"
+                                                   required>
                                         </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="manage_users">
-                                                <span>Manage Users</span>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="manage_services">
-                                                <span>Manage Services</span>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="manage_products">
-                                                <span>Manage Products</span>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="manage_trainings">
-                                                <span>Manage Trainings</span>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="manage_research">
-                                                <span>Manage Research</span>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="permissions[]" value="view_analytics">
-                                                <span>View Analytics</span>
-                                            </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="last_name"
+                                                   name="last_name"
+                                                   value="<?php echo $user ? htmlspecialchars($user['last_name']) : ''; ?>"
+                                                   required>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
+
+                                <div class="form-group mb-3">
+                                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email"
+                                           class="form-control"
+                                           id="email"
+                                           name="email"
+                                           value="<?php echo $user ? htmlspecialchars($user['email']) : ''; ?>"
+                                           required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel"
+                                           class="form-control"
+                                           id="phone"
+                                           name="phone"
+                                           value="<?php echo $user ? htmlspecialchars($user['phone']) : ''; ?>">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control"
+                                              id="address"
+                                              name="address"
+                                              rows="3"><?php echo $user ? htmlspecialchars($user['address']) : ''; ?></textarea>
+                                </div>
+
+                                <!-- Password Fields -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="password" class="form-label">
+                                                Password
+                                                <?php if (!$isEdit): ?>
+                                                    <span class="text-danger">*</span>
+                                                <?php else: ?>
+                                                    <small class="text-muted">(leave blank to keep current)</small>
+                                                <?php endif; ?>
+                                            </label>
+                                            <input type="password"
+                                                   class="form-control"
+                                                   id="password"
+                                                   name="password"
+                                                   <?php echo !$isEdit ? 'required' : ''; ?>>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="confirm_password" class="form-label">
+                                                Confirm Password
+                                                <?php if (!$isEdit): ?>
+                                                    <span class="text-danger">*</span>
+                                                <?php endif; ?>
+                                            </label>
+                                            <input type="password"
+                                                   class="form-control"
+                                                   id="confirm_password"
+                                                   name="confirm_password"
+                                                   <?php echo !$isEdit ? 'required' : ''; ?>>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <!-- Sidebar -->
                             <div class="col-lg-4">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6 class="card-title">Profile Picture</h6>
+                                        <h6 class="card-title">User Settings</h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="user-profile-upload">
-                                            <div class="profile-image-preview text-center mb-3">
-                                                <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
+                                        <div class="form-group mb-3">
+                                            <label for="role" class="form-label">User Role <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="role" name="role" required>
+                                                <option value="">Select Role</option>
+                                                <option value="Super Admin" <?php echo ($user && $user['role'] == 'Super Admin') ? 'selected' : ''; ?>>Super Admin</option>
+                                                <option value="Admin" <?php echo ($user && $user['role'] == 'Admin') ? 'selected' : ''; ?>>Admin</option>
+                                                <option value="Staff" <?php echo ($user && $user['role'] == 'Staff') ? 'selected' : ''; ?>>Staff</option>
+                                                <option value="User" <?php echo (!$user || $user['role'] == 'User') ? 'selected' : ''; ?>>User</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select class="form-control" id="status" name="status">
+                                                <option value="Active" <?php echo (!$user || $user['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
+                                                <option value="Inactive" <?php echo ($user && $user['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                                                <option value="Suspended" <?php echo ($user && $user['status'] == 'Suspended') ? 'selected' : ''; ?>>Suspended</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="avatar" class="form-label">Avatar</label>
+                                            <input type="file"
+                                                   class="form-control"
+                                                   id="avatar"
+                                                   name="avatar"
+                                                   accept="image/*">
+                                            <small class="form-text text-muted">
+                                                Supported formats: JPG, PNG, GIF. Max size: 2MB
+                                            </small>
+
+                                            <?php if ($user && !empty($user['avatar'])): ?>
+                                                <div class="mt-3">
+                                                    <label class="form-label">Current Avatar:</label>
+                                                    <div class="current-avatar">
+                                                        <img src="../../../<?php echo htmlspecialchars($user['avatar']); ?>"
+                                                             alt="Current avatar"
+                                                             class="img-thumbnail"
+                                                             style="max-width: 100px; max-height: 100px;">
+                                                    </div>
                                                 </div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php if ($user): ?>
+                                            <div class="user-info-card">
+                                                <h6 class="mb-2">Account Information</h6>
+                                                <div class="info-item">
+                                                    <small class="text-muted">Created:</small>
+                                                    <div><?php echo date('M j, Y', strtotime($user['created_at'])); ?></div>
+                                                </div>
+                                                <?php if (!empty($user['last_active'])): ?>
+                                                    <div class="info-item">
+                                                        <small class="text-muted">Last Active:</small>
+                                                        <div><?php echo date('M j, Y g:i A', strtotime($user['last_active'])); ?></div>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
-                                            
-                                            <div class="text-center">
-                                                <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
-                                                <button type="button" id="browseProfileBtn" class="btn btn-secondary btn-sm">
-                                                    <i class="fas fa-upload"></i> Upload Image
-                                                </button>
-                                                <p class="text-gray mt-2" style="font-size: 0.85rem;">JPG, PNG or GIF (Max 2MB)</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="card mt-3">
-                                    <div class="card-header">
-                                        <h6 class="card-title">Additional Options</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="sendWelcomeEmail" checked>
-                                                <span>Send welcome email</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="requirePasswordChange">
-                                                <span>Require password change on first login</span>
-                                            </label>
-                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="form-group mt-4">
-                            <label for="notes" class="form-label">Notes</label>
-                            <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Enter notes about this user"></textarea>
-                        </div>
-                        
-                        <div class="d-flex justify-between mt-4">
-                            <button type="button" class="btn btn-light" id="resetBtn">
-                                <i class="fas fa-undo"></i> Reset Form
+
+                        <!-- Form Actions -->
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                <?php echo $isEdit ? 'Update' : 'Save'; ?> User
                             </button>
-                            <div>
-                                <button type="button" class="btn btn-secondary mr-2" id="saveAsDraft">
-                                    <i class="fas fa-save"></i> Save as Draft
+                            <a href="all-users.php" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </a>
+                            <?php if ($isEdit && $currentUser['id'] != $user['id']): ?>
+                                <button type="button" class="btn btn-warning" onclick="resetPassword()">
+                                    <i class="fas fa-key"></i>
+                                    Reset Password
                                 </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-user-plus"></i> Create User
-                                </button>
-                            </div>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
             </div>
         </main>
     </div>
-    
-    <!-- Notification Container -->
-    <div class="notification-container"></div>
-    
+
     <!-- Admin JavaScript -->
     <script src="../../js/admin.js"></script>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Profile image upload handling
-            const browseProfileBtn = document.getElementById('browseProfileBtn');
-            const profileImage = document.getElementById('profileImage');
-            
-            browseProfileBtn.addEventListener('click', function() {
-                profileImage.click();
-            });
-            
-            profileImage.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const previewArea = document.querySelector('.profile-image-preview');
-                        previewArea.innerphp = `
-                            <div style="width: 150px; height: 150px; margin: 0 auto; border-radius: 50%; overflow: hidden;">
-                                <img src="${e.target.result}" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                            <button type="button" id="removeImageBtn" class="btn btn-sm btn-danger mt-2">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        `;
-                        
-                        // Add event listener to the remove button
-                        document.getElementById('removeImageBtn').addEventListener('click', function() {
-                            profileImage.value = '';
-                            previewArea.innerphp = `
-                                <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
-                                </div>
-                            `;
-                        });
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-            
-            // Form submission
-            const addUserForm = document.getElementById('addUserForm');
-            
-            addUserForm.addEventListener('submit', function(e) {
+        // Form validation
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            const firstName = document.getElementById('first_name').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const role = document.getElementById('role').value;
+            const isEdit = <?php echo $isEdit ? 'true' : 'false'; ?>;
+
+            if (!firstName) {
                 e.preventDefault();
-                
-                // Validate form
-                if (!validateForm('addUserForm')) {
-                    showNotification('Please fill in all required fields.', 'error');
-                    return;
+                alert('Please enter a first name.');
+                return false;
+            }
+
+            if (!lastName) {
+                e.preventDefault();
+                alert('Please enter a last name.');
+                return false;
+            }
+
+            if (!email) {
+                e.preventDefault();
+                alert('Please enter an email address.');
+                return false;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                alert('Please enter a valid email address.');
+                return false;
+            }
+
+            if (!role) {
+                e.preventDefault();
+                alert('Please select a user role.');
+                return false;
+            }
+
+            // Password validation for new users
+            if (!isEdit) {
+                if (!password) {
+                    e.preventDefault();
+                    alert('Please enter a password.');
+                    return false;
                 }
-                
-                // Check if passwords match
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                
+
+                if (password.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long.');
+                    return false;
+                }
+
                 if (password !== confirmPassword) {
-                    showNotification('Passwords do not match.', 'error');
-                    document.getElementById('confirmPassword').classList.add('is-invalid');
-                    return;
+                    e.preventDefault();
+                    alert('Passwords do not match.');
+                    return false;
                 }
-                
-                // Show loading state
-                const submitBtn = addUserForm.querySelector('[type="submit"]');
-                const originalBtnText = submitBtn.innerphp;
-                submitBtn.disabled = true;
-                submitBtn.innerphp = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                
-                // Simulate form submission (in a real app, this would be an AJAX call)
-                setTimeout(function() {
-                    // Reset form
-                    addUserForm.reset();
-                    
-                    // Reset profile image preview
-                    const previewArea = document.querySelector('.profile-image-preview');
-                    previewArea.innerphp = `
-                        <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
-                        </div>
-                    `;
-                    
-                    // Show success notification
-                    showNotification('User created successfully!', 'success');
-                    
-                    // Reset button state
-                    submitBtn.disabled = false;
-                    submitBtn.innerphp = originalBtnText;
-                }, 1500);
-            });
-            
-            // Reset form button
-            const resetBtn = document.getElementById('resetBtn');
-            resetBtn.addEventListener('click', function() {
-                if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
-                    addUserForm.reset();
-                    
-                    // Reset profile image preview
-                    const previewArea = document.querySelector('.profile-image-preview');
-                    previewArea.innerphp = `
-                        <div style="width: 150px; height: 150px; background-color: #f4f6f7; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user" style="font-size: 4rem; color: #95a5a6;"></i>
-                        </div>
-                    `;
+            } else {
+                // For editing, only validate if password is provided
+                if (password && password.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long.');
+                    return false;
                 }
-            });
-            
-            // Save as draft button
-            const saveAsDraft = document.getElementById('saveAsDraft');
-            saveAsDraft.addEventListener('click', function() {
-                showNotification('User saved as draft.', 'success');
-            });
-            
-            // Auto-select permissions based on role
-            const roleSelect = document.getElementById('role');
-            const permissionCheckboxes = document.querySelectorAll('input[name="permissions[]"]');
-            
-            roleSelect.addEventListener('change', function() {
-                const role = this.value;
-                
-                // Reset all permissions
-                permissionCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                
-                // Set permissions based on role
-                if (role === 'admin') {
-                    // Admins get all permissions
-                    permissionCheckboxes.forEach(checkbox => {
-                        checkbox.checked = true;
-                    });
-                } else if (role === 'staff') {
-                    // Staff get limited permissions
-                    const staffPermissions = ['view_dashboard', 'manage_services', 'manage_products', 'view_analytics'];
-                    
-                    permissionCheckboxes.forEach(checkbox => {
-                        if (staffPermissions.includes(checkbox.value)) {
-                            checkbox.checked = true;
-                        }
-                    });
-                } else if (role === 'customer') {
-                    // Customers get minimal permissions
-                    const customerPermissions = ['view_dashboard'];
-                    
-                    permissionCheckboxes.forEach(checkbox => {
-                        if (customerPermissions.includes(checkbox.value)) {
-                            checkbox.checked = true;
-                        }
-                    });
+
+                if (password && password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match.');
+                    return false;
                 }
-            });
+            }
+        });
+
+        // Password reset function
+        function resetPassword() {
+            if (confirm('Are you sure you want to reset this user\'s password? A new temporary password will be generated and sent to their email.')) {
+                // Here you would implement the password reset functionality
+                alert('Password reset functionality would be implemented here.');
+            }
+        }
+
+        // Show/hide password confirmation based on password field
+        document.getElementById('password').addEventListener('input', function() {
+            const confirmField = document.getElementById('confirm_password');
+            if (this.value) {
+                confirmField.required = true;
+                confirmField.parentElement.style.display = 'block';
+            } else {
+                confirmField.required = false;
+                if (<?php echo $isEdit ? 'true' : 'false'; ?>) {
+                    confirmField.parentElement.style.display = 'none';
+                }
+            }
         });
     </script>
 </body>
-</php> 
+</html>

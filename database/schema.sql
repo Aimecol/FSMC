@@ -222,3 +222,6 @@ CREATE INDEX idx_training_status ON training_programs(status);
 CREATE INDEX idx_research_status ON research_projects(status);
 CREATE INDEX idx_messages_status ON messages(status);
 CREATE INDEX idx_contact_status ON contact_submissions(status);
+CREATE INDEX idx_activity_user ON user_activity_logs(user_id);
+CREATE INDEX idx_activity_action ON user_activity_logs(action);
+CREATE INDEX idx_activity_date ON user_activity_logs(created_at);
