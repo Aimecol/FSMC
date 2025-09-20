@@ -257,47 +257,162 @@ $categories = getAllRecords('service_categories', 'name ASC');
                                               name="requirements"
                                               rows="4"><?php echo $service ? htmlspecialchars($service['requirements']) : ''; ?></textarea>
                                 </div>
-                            </div>
-                                        <option value="consulting">Consulting</option>
-                                        <option value="training">Training</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="serviceShortDesc" class="form-label">Short Description*</label>
-                                    <textarea id="serviceShortDesc" name="serviceShortDesc" class="form-control" rows="3" placeholder="Brief description (150 characters max)" required></textarea>
-                                    <small class="text-gray">This will appear in service cards and listings</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="serviceFullDesc" class="form-label">Full Description*</label>
-                                    <textarea id="serviceFullDesc" name="serviceFullDesc" class="form-control form-textarea" rows="6" placeholder="Detailed description of the service" required></textarea>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="serviceFeatures" class="form-label">Key Features</label>
-                                    <textarea id="serviceFeatures" name="serviceFeatures" class="form-control" rows="4" placeholder="Enter key features (one per line)"></textarea>
-                                    <small class="text-gray">Each line will be displayed as a separate feature point</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Service Options</label>
-                                    <div class="d-flex gap-4 mt-2">
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="isFeatured" id="isFeatured">
-                                                <span>Featured Service</span>
-                                            </label>
+
+                            <!-- Sidebar -->
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title">Service Settings</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select class="form-control" id="status" name="status">
+                                                <option value="Active" <?php echo (!$service || $service['status'] == 'Active') ? 'selected' : ''; ?>>Active</option>
+                                                <option value="Inactive" <?php echo ($service && $service['status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                                                <option value="Coming Soon" <?php echo ($service && $service['status'] == 'Coming Soon') ? 'selected' : ''; ?>>Coming Soon</option>
+                                            </select>
                                         </div>
-                                        <div>
-                                            <label class="d-flex align-center gap-2">
-                                                <input type="checkbox" name="isPopular" id="isPopular">
-                                                <span>Popular Service</span>
-                                            </label>
+
+                                        <div class="form-group mb-3">
+                                            <label for="image" class="form-label">Service Image</label>
+                                            <input type="file"
+                                                   class="form-control"
+                                                   id="image"
+                                                   name="image"
+                                                   accept="image/*">
+                                            <small class="form-text text-muted">
+                                                Supported formats: JPG, PNG, GIF. Max size: 5MB
+                                            </small>
+
+                                            <?php if ($service && !empty($service['image'])): ?>
+                                                <div class="mt-3">
+                                                    <label class="form-label">Current Image:</label>
+                                                    <div class="current-image">
+                                                        <img src="../../../<?php echo htmlspecialchars($service['image']); ?>"
+                                                             alt="Current service image"
+                                                             class="img-thumbnail"
+                                                             style="max-width: 200px; max-height: 200px;">
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
+
+                                        <?php if ($service): ?>
+                                            <div class="service-info-card">
+                                                <h6 class="mb-2">Service Information</h6>
+                                                <div class="info-item">
+                                                    <small class="text-muted">Created:</small>
+                                                    <div><?php echo date('M j, Y', strtotime($service['created_at'])); ?></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <small class="text-muted">Last Updated:</small>
+                                                    <div><?php echo date('M j, Y', strtotime($service['updated_at'])); ?></div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                <?php echo $isEdit ? 'Update' : 'Save'; ?> Service
+                            </button>
+                            <a href="all-services.php" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin JavaScript -->
+    <script src="../../js/admin.js"></script>
+
+    <script>
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '.tinymce',
+            height: 300,
+            menubar: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+        });
+
+        // Form validation
+        document.getElementById('serviceForm').addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value.trim();
+            const shortDescription = document.getElementById('short_description').value.trim();
+            const description = tinymce.get('description').getContent();
+            const categoryId = document.getElementById('category_id').value;
+
+            if (!name) {
+                e.preventDefault();
+                alert('Please enter a service name.');
+                return false;
+            }
+
+            if (!shortDescription) {
+                e.preventDefault();
+                alert('Please enter a short description.');
+                return false;
+            }
+
+            if (!description) {
+                e.preventDefault();
+                alert('Please enter a full description.');
+                return false;
+            }
+
+            if (!categoryId) {
+                e.preventDefault();
+                alert('Please select a category.');
+                return false;
+            }
+        });
+
+        // Character counter for short description
+        document.getElementById('short_description').addEventListener('input', function() {
+            const maxLength = 200;
+            const currentLength = this.value.length;
+            const remaining = maxLength - currentLength;
+
+            // Create or update character counter
+            let counter = this.parentElement.querySelector('.char-counter');
+            if (!counter) {
+                counter = document.createElement('small');
+                counter.className = 'char-counter form-text';
+                this.parentElement.appendChild(counter);
+            }
+
+            counter.textContent = `${currentLength}/${maxLength} characters`;
+            counter.className = `char-counter form-text ${remaining < 20 ? 'text-warning' : 'text-muted'}`;
+
+            if (currentLength > maxLength) {
+                counter.className = 'char-counter form-text text-danger';
+                this.setCustomValidity('Description is too long');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>
                             
                             <div class="col-lg-4">
                                 <div class="card mb-4">
