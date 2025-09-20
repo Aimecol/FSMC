@@ -1,0 +1,1366 @@
+<!DOCTYPE php>
+<php lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>First Registration - Banner Fair Surveying & Mapping Ltd</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
+    <style>
+      :root {
+        --primary-color: #1a5276;
+        --secondary-color: #2e86c1;
+        --accent-color: #f39c12;
+        --light-color: #f4f6f7;
+        --dark-color: #2c3e50;
+        --text-dark: #2c3e50;
+        --text-light: #7f8c8d;
+        --white: #ffffff;
+        --gray-light: #ecf0f1;
+        --gray-medium: #bdc3c7;
+        --success-color: #27ae60;
+        --error-color: #e74c3c;
+        --box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background-color: var(--light-color);
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .breadcrumb {
+        padding: 15px 0;
+        background-color: var(--white);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .breadcrumb-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 7rem;
+      }
+
+      .breadcrumb-links a {
+        color: var(--secondary-color);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .breadcrumb-links a:hover {
+        color: var(--primary-color);
+      }
+
+      .breadcrumb-links span {
+        color: var(--text-light);
+      }
+
+      /* Hero Section */
+      .service-hero {
+        background: linear-gradient(
+            rgba(28, 40, 51, 0.8),
+            rgba(28, 40, 51, 0.8)
+          ),
+          url("../images/9c_NLZ75_JAwFH7mjiGB_.jpg") center/cover no-repeat;
+        color: var(--white);
+        padding: 100px 0;
+        text-align: center;
+        position: relative;
+      }
+
+      .service-hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .service-hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 15px;
+      }
+
+      .service-hero h1:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background-color: var(--accent-color);
+      }
+
+      .service-hero p {
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .service-hero .language-tags {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .language-tag {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .cta-button {
+        display: inline-block;
+        background-color: var(--accent-color);
+        color: var(--white);
+        padding: 12px 25px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+      }
+
+      .cta-button:hover {
+        background-color: #e67e22;
+        transform: translateY(-2px);
+      }
+
+      /* Overview Section */
+      .service-overview {
+        background-color: var(--white);
+        padding: 80px 0;
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: 50px;
+        position: relative;
+        padding-bottom: 15px;
+      }
+
+      .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background-color: var(--accent-color);
+      }
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .overview-card {
+        background-color: var(--light-color);
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+      }
+
+      .overview-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .overview-card-icon {
+        background-color: var(--primary-color);
+        color: var(--white);
+        font-size: 2rem;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .overview-card-content {
+        padding: 25px;
+      }
+
+      .overview-card h3 {
+        margin-bottom: 15px;
+        color: var(--primary-color);
+      }
+
+      /* Process Section */
+      .service-process {
+        background-color: var(--light-color);
+        padding: 80px 0;
+      }
+
+      .process-steps {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 50px;
+        position: relative;
+      }
+
+      .process-steps:before {
+        content: "";
+        position: absolute;
+        top: 25px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--gray-medium);
+        z-index: 1;
+      }
+
+      .process-step {
+        flex: 1;
+        min-width: 200px;
+        max-width: 220px;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        padding: 0 15px;
+      }
+
+      .step-number {
+        background-color: var(--secondary-color);
+        color: var(--white);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 15px rgba(46, 134, 193, 0.3);
+      }
+
+      .step-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+
+      .step-description {
+        font-size: 0.95rem;
+        color: var(--text-light);
+      }
+
+      /* Benefits Section */
+      .service-benefits {
+        background-color: var(--white);
+        padding: 80px 0;
+      }
+
+      .benefits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .benefit-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        background-color: var(--light-color);
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+      }
+
+      .benefit-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .benefit-icon {
+        color: var(--accent-color);
+        font-size: 1.5rem;
+        background-color: rgba(243, 156, 18, 0.1);
+        padding: 10px;
+        border-radius: 50%;
+      }
+
+      .benefit-content h3 {
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+
+      /* Requirements Section */
+      .service-requirements {
+        background-color: var(--gray-light);
+        padding: 80px 0;
+      }
+
+      .requirements-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .requirements-list {
+        background-color: var(--white);
+        padding: 30px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+      }
+
+      .requirements-list h3 {
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--accent-color);
+      }
+
+      .requirements-list ul {
+        list-style-type: none;
+      }
+
+      .requirements-list li {
+        margin-bottom: 15px;
+        position: relative;
+        padding-left: 25px;
+      }
+
+      .requirements-list li:before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--success-color);
+        position: absolute;
+        left: 0;
+      }
+
+      .requirements-image {
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+      }
+
+      .requirements-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* FAQ Section */
+      .service-faq {
+        background-color: var(--white);
+        padding: 80px 0;
+      }
+
+      .faq-container {
+        max-width: 800px;
+        margin: 40px auto 0;
+      }
+
+      .faq-item {
+        margin-bottom: 15px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+      }
+
+      .faq-question {
+        background-color: var(--light-color);
+        padding: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 600;
+      }
+
+      .faq-question:hover {
+        background-color: rgba(244, 246, 247, 0.8);
+      }
+
+      .faq-answer {
+        padding: 0 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: var(--transition);
+        background-color: white;
+      }
+
+      .faq-answer p {
+        padding: 20px 0;
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 500px;
+      }
+
+      .faq-toggle {
+        transition: var(--transition);
+      }
+
+      .faq-item.active .faq-toggle {
+        transform: rotate(180deg);
+      }
+
+      /* Related Services Section */
+      .related-services {
+        background-color: var(--white);
+        padding: 80px 0;
+      }
+
+      .related-services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .related-service-card {
+        background-color: var(--light-color);
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+      }
+
+      .related-service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .related-service-image {
+        height: 200px;
+        overflow: hidden;
+      }
+
+      .related-service-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+      }
+
+      .related-service-card:hover .related-service-image img {
+        transform: scale(1.1);
+      }
+
+      .related-service-content {
+        padding: 20px;
+      }
+
+      .related-service-content h3 {
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+
+      .related-service-content p {
+        color: var(--text-light);
+        margin-bottom: 15px;
+      }
+
+      .service-link {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: var(--transition);
+      }
+
+      .service-link:hover {
+        color: var(--primary-color);
+      }
+
+      .service-link i {
+        transition: var(--transition);
+      }
+
+      .service-link:hover i {
+        transform: translateX(5px);
+      }
+
+      /* Responsive styling */
+      @media (max-width: 1024px) {
+        .process-steps {
+          flex-direction: column;
+          align-items: center;
+          gap: 40px;
+        }
+
+        .process-steps:before {
+          display: none;
+        }
+
+        .process-step {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .service-hero h1 {
+          font-size: 2.2rem;
+        }
+
+        .service-hero p {
+          font-size: 1rem;
+        }
+
+        .section-title {
+          font-size: 1.8rem;
+        }
+
+        .overview-grid,
+        .benefits-list,
+        .requirements-container,
+        .related-services-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .service-hero h1 {
+          font-size: 1.8rem;
+        }
+
+        .language-tags {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .testimonial-author {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+
+      /* Contact Form Section */
+      .contact-form-section {
+        background-color: var(--light-color);
+        padding: 80px 0;
+      }
+
+      .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-top: 40px;
+      }
+
+      .contact-form {
+        background-color: var(--white);
+        padding: 30px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 5px;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      .contact-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-dark);
+      }
+
+      .contact-form input,
+      .contact-form select,
+      .contact-form textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--gray-medium);
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .contact-form input:focus,
+      .contact-form select:focus,
+      .contact-form textarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.2);
+      }
+
+      .contact-form input.error,
+      .contact-form select.error,
+      .contact-form textarea.error {
+        border-color: var(--error-color);
+      }
+
+      .submit-button {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: 12px 25px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: var(--transition);
+        width: 100%;
+      }
+
+      .submit-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+
+      .service-contact-info {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .info-card {
+        background-color: var(--white);
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: var(--box-shadow);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: var(--transition);
+      }
+
+      .info-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .info-icon {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(26, 82, 118, 0.1);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+      }
+
+      .info-content h3 {
+        margin-bottom: 5px;
+        color: var(--primary-color);
+      }
+
+      .info-content p {
+        color: var(--text-light);
+        line-height: 1.4;
+      }
+
+      /* Responsive updates */
+      @media (max-width: 992px) {
+        .contact-container {
+          grid-template-columns: 1fr;
+        }
+
+        .service-contact-info {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .contact-form {
+          grid-template-columns: 1fr;
+        }
+
+        .service-contact-info {
+          grid-template-columns: 1fr;
+        }
+
+        .info-card {
+          flex-direction: column;
+          text-align: center;
+          padding: 25px 15px;
+        }
+
+        .info-icon {
+          margin-bottom: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .submit-button {
+          padding: 10px 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <?php include 'includes/header.php'; ?>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb">
+      <div class="container">
+        <div class="breadcrumb-links">
+          <a href="../index.php"><i class="fas fa-home"></i> Home</a>
+          <i class="fas fa-chevron-right"></i>
+          <a href="./services.php">Services</a>
+          <i class="fas fa-chevron-right"></i>
+          <span>First Registration</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hero Section -->
+    <section class="service-hero">
+      <div class="container">
+        <div class="service-hero-content">
+          <h1>First Registration Services</h1>
+          <div class="language-tags">
+            <span class="language-tag"
+              ><i class="fas fa-globe"></i> English</span
+            >
+            <span class="language-tag"
+              ><i class="fas fa-globe"></i> Kinyarwanda</span
+            >
+          </div>
+          <p>
+            Comprehensive first-time registration services for land parcels,
+            ensuring accurate measurements and legal documentation for your
+            property.
+          </p>
+          <a href="./contact.php" class="cta-button"
+            ><i class="fas fa-phone-alt"></i> Request a Consultation</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section class="service-overview">
+      <div class="container">
+        <h2 class="section-title">Service Overview</h2>
+        <p>
+          First Registration is the process of officially recording a property
+          with the land registry for the first time. Our expert team will guide
+          you through every step of this important process, ensuring that your
+          property is properly surveyed, documented, and legally registered.
+        </p>
+
+        <div class="overview-grid">
+          <div class="overview-card">
+            <div class="overview-card-icon">
+              <i class="fas fa-ruler-combined"></i>
+            </div>
+            <div class="overview-card-content">
+              <h3>Accurate Surveying</h3>
+              <p>
+                We use state-of-the-art equipment and professional techniques to
+                ensure precise measurements of your land parcel, helping to
+                avoid future boundary disputes.
+              </p>
+            </div>
+          </div>
+
+          <div class="overview-card">
+            <div class="overview-card-icon">
+              <i class="fas fa-file-signature"></i>
+            </div>
+            <div class="overview-card-content">
+              <h3>Legal Documentation</h3>
+              <p>
+                Our team prepares all necessary legal documents required by land
+                registration authorities, ensuring compliance with all relevant
+                laws and regulations.
+              </p>
+            </div>
+          </div>
+
+          <div class="overview-card">
+            <div class="overview-card-icon">
+              <i class="fas fa-hands-helping"></i>
+            </div>
+            <div class="overview-card-content">
+              <h3>End-to-End Support</h3>
+              <p>
+                We provide comprehensive support throughout the entire
+                registration process, from initial consultation to final
+                registration certificate.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="service-process">
+      <div class="container">
+        <h2 class="section-title">Our Process</h2>
+        <p>
+          We follow a systematic approach to ensure your first registration is
+          completed efficiently and accurately.
+        </p>
+
+        <div class="process-steps">
+          <div class="process-step">
+            <div class="step-number">1</div>
+            <div class="step-title">Initial Consultation</div>
+            <div class="step-description">
+              We meet with you to understand your property needs and gather
+              initial information.
+            </div>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">2</div>
+            <div class="step-title">Property Survey</div>
+            <div class="step-description">
+              Our professional surveyors conduct a thorough assessment and
+              measurement of your land.
+            </div>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">3</div>
+            <div class="step-title">Documentation</div>
+            <div class="step-description">
+              We prepare all necessary legal documents and application forms for
+              submission.
+            </div>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">4</div>
+            <div class="step-title">Registration</div>
+            <div class="step-description">
+              We submit your application to the land registry and monitor its
+              progress.
+            </div>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">5</div>
+            <div class="step-title">Certificate Issuance</div>
+            <div class="step-description">
+              Once approved, we help you obtain your official registration
+              certificate.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="service-benefits">
+      <div class="container">
+        <h2 class="section-title">Benefits of First Registration</h2>
+        <p>
+          Properly registering your land offers numerous advantages that protect
+          your investment and provide peace of mind.
+        </p>
+
+        <div class="benefits-list">
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Legal Protection</h3>
+              <p>
+                Official registration provides legal recognition of your
+                ownership rights, protecting you from potential disputes.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Property Value</h3>
+              <p>
+                Registered properties typically have higher market values and
+                are more attractive to potential buyers.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-landmark"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Financial Access</h3>
+              <p>
+                Registered land can be used as collateral for loans, improving
+                your access to financial resources.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Ease of Transfer</h3>
+              <p>
+                Properly registered land simplifies future property transfers,
+                sales, or inheritance processes.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-gavel"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Dispute Prevention</h3>
+              <p>
+                Clear boundaries and official documentation minimize the risk of
+                boundary disputes with neighbors.
+              </p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="benefit-content">
+              <h3>Development Opportunities</h3>
+              <p>
+                Registered land creates opportunities for development projects
+                and investments on your property.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Requirements Section -->
+    <section class="service-requirements">
+      <div class="container">
+        <h2 class="section-title">Requirements for First Registration</h2>
+        <p>
+          To initiate the first registration process, you'll need to provide
+          certain documents and meet specific requirements.
+        </p>
+
+        <div class="requirements-container">
+          <div class="requirements-list">
+            <h3>Required Documents</h3>
+            <ul>
+              <li>Identity documents (National ID, passport)</li>
+              <li>
+                Proof of ownership (purchase agreement, inheritance documents)
+              </li>
+              <li>Land acquisition documents</li>
+              <li>Tax clearance certificate</li>
+              <li>Existing plot plans or sketches (if available)</li>
+              <li>Power of attorney (if acting on behalf of owner)</li>
+              <li>Passport-sized photographs</li>
+            </ul>
+          </div>
+
+          <div class="requirements-image">
+            <img
+              src="../images/9c_NLZ75_JAwFH7mjiGB_.jpg"
+              alt="Land Registration Documents"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="service-faq">
+      <div class="container">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p>
+          Here are answers to some common questions about the first registration
+          process.
+        </p>
+
+        <div class="faq-container">
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>How long does the first registration process take?</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                The duration of the first registration process can vary
+                depending on several factors, including the complexity of the
+                property, the completeness of your documentation, and the
+                current workload of the land registry office. Typically, the
+                process takes between 4-8 weeks from the initial survey to the
+                issuance of the registration certificate. Our team works
+                diligently to expedite the process wherever possible.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>What is the cost of first registration services?</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                The cost of first registration services varies based on the size
+                and location of your property, as well as the complexity of the
+                registration process. We provide a detailed quote after the
+                initial consultation, which includes all survey costs,
+                documentation preparation, and registration fees. We believe in
+                transparent pricing with no hidden charges, and we offer
+                competitive rates in the market.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Do I need to be present during the property survey?</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                While it's not mandatory, we highly recommend that you or your
+                authorized representative be present during the property survey.
+                This allows you to point out any specific features or boundary
+                concerns and ensures that all parties are in agreement about the
+                property boundaries. If you cannot be present, we can proceed
+                with the survey based on the documentation provided, but your
+                presence helps minimize potential disputes later.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Can you help with disputed boundaries?</span>
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Yes, we have extensive experience in resolving boundary
+                disputes. Our professional surveyors use precise measurement
+                techniques and historical records to determine accurate
+                boundaries. If disputes arise during the registration process,
+                we can facilitate mediation between neighbors and provide expert
+                testimony if needed. We always aim for amicable resolutions that
+                protect your interests while maintaining good neighborly
+                relations.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span
+                >What happens if there are issues with my documentation?</span
+              >
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                If we identify any issues with your documentation during the
+                registration process, our team will promptly notify you and
+                provide guidance on how to address them. This might involve
+                obtaining additional documents, correcting inconsistencies, or
+                clarifying information with relevant authorities. We have
+                relationships with various government offices and can often
+                expedite the resolution of documentation issues to keep your
+                registration process moving forward.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span
+                >Can you handle registration for different types of
+                properties?</span
+              >
+              <i class="fas fa-chevron-down faq-toggle"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Yes, our team is experienced in handling first registration for
+                various types of properties, including residential plots,
+                commercial land, agricultural land, and special purpose
+                properties. Each type of property may have specific requirements
+                and regulations, which our experts are familiar with. We
+                customize our approach based on the property type to ensure
+                compliance with all relevant laws and regulations.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="contact-form-section" id="contact-form">
+      <div class="container">
+        <h2 class="section-title">Get in Touch</h2>
+        <p>
+          Fill out the form below, and one of our registration specialists will
+          contact you within 24 hours.
+        </p>
+
+        <div class="contact-container">
+          <form class="contact-form">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Your full name"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Your email address"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Your phone number"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="property-type">Property Type</label>
+              <select id="property-type" name="property-type" required>
+                <option value="" disabled selected>Select property type</option>
+                <option value="residential">Residential</option>
+                <option value="commercial">Commercial</option>
+                <option value="agricultural">Agricultural</option>
+                <option value="mixed-use">Mixed-Use</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="property-location">Property Location</label>
+              <input
+                type="text"
+                id="property-location"
+                name="property-location"
+                placeholder="District, Sector, Cell"
+                required
+              />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="message">Additional Information</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                placeholder="Please provide any additional details about your property or specific requirements"
+              ></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <button type="submit" class="submit-button">
+                Submit Inquiry
+              </button>
+            </div>
+          </form>
+
+          <div class="service-contact-info">
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="info-content">
+                <h3>Our Office</h3>
+                <p>123 KG Avenue, Kigali Business Center<br />Kigali, Rwanda</p>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-phone-alt"></i>
+              </div>
+              <div class="info-content">
+                <h3>Phone</h3>
+                <p>+250 780 123 456<br />+250 725 789 012</p>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="info-content">
+                <h3>Email</h3>
+                <p>info@bannerfair.com<br />registration@bannerfair.com</p>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="info-content">
+                <h3>Working Hours</h3>
+                <p>
+                  Monday - Friday: 8:00 AM - 5:00 PM<br />Saturday: 9:00 AM -
+                  1:00 PM
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Services Section -->
+    <section class="related-services">
+      <div class="container">
+        <h2 class="section-title">Related Services</h2>
+        <p>
+          Explore our other professional surveying and mapping services that
+          might be of interest.
+        </p>
+
+        <div class="related-services-grid">
+          <div class="related-service-card">
+            <div class="related-service-image">
+              <img
+                src="../images/9c_NLZ75_JAwFH7mjiGB_.jpg"
+                alt="Boundary Survey"
+              />
+            </div>
+            <div class="related-service-content">
+              <h3>Boundary Surveys</h3>
+              <p>
+                Accurate determination and marking of property boundaries to
+                prevent disputes and ensure legal compliance.
+              </p>
+              <a href="boundary-surveys.php" class="service-link"
+                >Learn More <i class="fas fa-arrow-right"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="related-service-card">
+            <div class="related-service-image">
+              <img
+                src="../images/9ymlPUvjUSWPlrk-qrJ2k.jpg"
+                alt="Topographic Survey"
+              />
+            </div>
+            <div class="related-service-content">
+              <h3>Topographic Surveys</h3>
+              <p>
+                Detailed mapping of land elevations and features for
+                construction planning and development projects.
+              </p>
+              <a href="topographic-surveys.php" class="service-link"
+                >Learn More <i class="fas fa-arrow-right"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="related-service-card">
+            <div class="related-service-image">
+              <img
+                src="../images/bhHQ2-XvUG3QKct5kwamE.jpg"
+                alt="Property Subdivision"
+              />
+            </div>
+            <div class="related-service-content">
+              <h3>Property Subdivision</h3>
+              <p>
+                Professional division of land into smaller parcels for
+                development or sale, with all necessary legal documentation.
+              </p>
+              <a href="property-subdivision.php" class="service-link"
+                >Learn More <i class="fas fa-arrow-right"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <?php include 'includes/footer.php'; ?>
+    
+    <script src="../js/script.js"></script>
+    <script>
+      // FAQ Accordion
+      document.querySelectorAll(".faq-question").forEach((question) => {
+        question.addEventListener("click", () => {
+          const item = question.parentElement;
+          const isActive = item.classList.contains("active");
+
+          // Close all FAQ items
+          document.querySelectorAll(".faq-item").forEach((faqItem) => {
+            faqItem.classList.remove("active");
+          });
+
+          // If clicked item wasn't active, open it
+          if (!isActive) {
+            item.classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</php>

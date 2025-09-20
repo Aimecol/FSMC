@@ -990,6 +990,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 576px) {
   .hero {
     margin-top: 50px;
