@@ -41,7 +41,7 @@
       <section class="products-grid" id="equipmentGrid">
         <div class="product-card" data-category="equipment">
           <div class="product-image">
-            <i class="fas fa-broadcast-tower"></i>
+            <img src="../images/total-station.jpg" alt="" /> 
           </div>
           <div class="product-details">
             <h3 class="product-title">Total Station Professional</h3>
@@ -70,7 +70,7 @@
 
         <div class="product-card" data-category="equipment">
           <div class="product-image">
-            <i class="fas fa-satellite-dish"></i>
+            <img src="../images/differential-gps.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">RTK GPS System</h3>
@@ -105,7 +105,7 @@
 
         <div class="product-card" data-category="equipment">
           <div class="product-image">
-            <i class="fas fa-ruler-combined"></i>
+            <img src="../images/digital-level.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">Digital Level</h3>
@@ -141,7 +141,7 @@
       <section class="products-grid" id="softwareGrid">
         <div class="product-card" data-category="software">
           <div class="product-image">
-            <i class="fas fa-drafting-compass"></i>
+            <img src="../images/autocad.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">AutoCAD Software</h3>
@@ -172,7 +172,7 @@
 
         <div class="product-card" data-category="software">
           <div class="product-image">
-            <i class="fas fa-globe-africa"></i>
+            <img src="../images/arcgis.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">ArcGIS Software</h3>
@@ -200,7 +200,7 @@
 
         <div class="product-card" data-category="software">
           <div class="product-image">
-            <i class="fas fa-laptop-code"></i>
+            <img src="../images/python.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">Python for Data Analysis</h3>
@@ -236,7 +236,7 @@
       <section class="products-grid" id="trainingGrid">
         <div class="product-card" data-category="training">
           <div class="product-image">
-            <i class="fas fa-chalkboard-teacher"></i>
+            <img src="../images/training.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">Surveying Equipment Training</h3>
@@ -266,7 +266,7 @@
 
         <div class="product-card" data-category="training">
           <div class="product-image">
-            <i class="fas fa-brain"></i>
+            <img src="../images/ai.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">AI for GIS Analysis</h3>
@@ -299,7 +299,7 @@
 
         <div class="product-card" data-category="training">
           <div class="product-image">
-            <i class="fas fa-satellite"></i>
+            <img src="../images/satellite.jpg" alt="" />
           </div>
           <div class="product-details">
             <h3 class="product-title">Remote Sensing Analysis</h3>
@@ -339,7 +339,7 @@
         <div class="products-grid">
           <div class="product-card" data-category="bundle">
             <div class="product-image">
-              <i class="fas fa-layer-group"></i>
+              <img src="../images/bundle1.jpg" alt="" />
             </div>
             <div class="product-details">
               <h3 class="product-title">Surveyor Starter Bundle</h3>
@@ -366,7 +366,7 @@
 
           <div class="product-card" data-category="bundle">
             <div class="product-image">
-              <i class="fas fa-cubes"></i>
+              <img src="../images/bundle2.jpg" alt="" />
             </div>
             <div class="product-details">
               <h3 class="product-title">GIS Professional Bundle</h3>
@@ -539,7 +539,7 @@
             title: "Total Station Professional",
             description:
               "High-precision surveying instrument for accurate measurements in the field. Ideal for construction layout, topographic surveys, and boundary determinations.",
-            icon: "fa-broadcast-tower",
+            icon: "total-station",
             manufacturer: "Trimble",
             model: "SX10",
             warranty: "2 Years",
@@ -549,7 +549,7 @@
             title: "RTK GPS System",
             description:
               "Real-time kinematic GPS system for centimeter-level positioning accuracy. Perfect for detailed mapping and staking applications.",
-            icon: "fa-satellite-dish",
+            icon: "differential-gps",
             manufacturer: "Leica Geosystems",
             model: "GS18 T",
             warranty: "3 Years",
@@ -559,7 +559,7 @@
             title: "Digital Level",
             description:
               "Precise digital leveling instrument for elevation measurements. Streamline your workflow with automated calculations and data recording.",
-            icon: "fa-ruler-combined",
+            icon: "digital-level",
             manufacturer: "Topcon",
             model: "DL-500",
             warranty: "1 Year",
@@ -569,7 +569,7 @@
             title: "AutoCAD Software",
             description:
               "Industry-standard CAD software for precise drafting and design. Create detailed 2D and 3D models for surveying and engineering projects.",
-            icon: "fa-drafting-compass",
+            icon: "autocad",
             manufacturer: "Autodesk",
             model: "AutoCAD 2025",
             warranty: "Lifetime License",
@@ -579,7 +579,7 @@
             title: "ArcGIS Software",
             description:
               "Comprehensive GIS software for spatial data analysis and mapping. Analyze patterns, visualize data, and create professional maps.",
-            icon: "fa-globe-africa",
+            icon: "arcgis",
             manufacturer: "Esri",
             model: "ArcGIS Pro",
             warranty: "Annual Subscription",
@@ -589,7 +589,7 @@
             title: "Python for Data Analysis",
             description:
               "Python packages for geospatial data processing and analysis. Custom solutions for data manipulation, visualization, and modeling.",
-            icon: "fa-laptop-code",
+            icon: "python",
             manufacturer: "Banner Fair",
             model: "Custom Package",
             warranty: "6 Months Support",
@@ -599,7 +599,7 @@
             title: "Surveying Equipment Training",
             description:
               "Comprehensive training materials for total station and GPS equipment. Learn how to operate and maintain your surveying instruments effectively.",
-            icon: "fa-chalkboard-teacher",
+            icon: "training",
             manufacturer: "Banner Fair",
             model: "Version 2025",
             warranty: "1 Year Updates",
@@ -609,7 +609,7 @@
             title: "AI for GIS Analysis",
             description:
               "Training materials for implementing AI in geospatial data analysis. Learn machine learning and deep learning techniques for geospatial applications.",
-            icon: "fa-brain",
+            icon: "ai",
             manufacturer: "Banner Fair",
             model: "Version 2025",
             warranty: "1 Year Updates",
@@ -619,7 +619,7 @@
             title: "Remote Sensing Analysis",
             description:
               "Comprehensive training on satellite imagery and remote sensing techniques. Master image classification, change detection, and environmental monitoring.",
-            icon: "fa-satellite",
+            icon: "satellite",
             manufacturer: "Banner Fair",
             model: "Version 2025",
             warranty: "1 Year Updates",
@@ -629,7 +629,7 @@
             title: "Surveyor Starter Bundle",
             description:
               "Complete package for beginners in land surveying. Includes equipment, software, and training to get you started.",
-            icon: "fa-layer-group",
+            icon: "bundle1",
             manufacturer: "Banner Fair",
             model: "Starter Bundle 2025",
             warranty: "2 Years",
@@ -639,7 +639,7 @@
             title: "GIS Professional Bundle",
             description:
               "Advanced GIS software and training for professionals. Comprehensive solution for spatial data analysis and mapping.",
-            icon: "fa-cubes",
+            icon: "bundle2",
             manufacturer: "Banner Fair",
             model: "Pro Bundle 2025",
             warranty: "3 Years",
@@ -654,7 +654,7 @@
 
             modalProductTitle.textContent = product.title;
             modalProductDescription.textContent = product.description;
-            modalProductImage.innerphp = `<i class="fas ${product.icon}"></i>`;
+            modalProductImage.innerphp = `<img src="../images/${product.icon}.jpg" alt="" />`;
             specManufacturer.textContent = product.manufacturer;
             specModel.textContent = product.model;
             specWarranty.textContent = product.warranty;
