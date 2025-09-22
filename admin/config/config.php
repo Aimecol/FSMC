@@ -10,11 +10,6 @@ if (!defined('ADMIN_ACCESS')) {
     define('ADMIN_ACCESS', true);
 }
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // Error reporting (disable in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -41,11 +36,16 @@ define('MAX_IMAGE_SIZE', 5 * 1024 * 1024);  // 5MB
 define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 define('ALLOWED_DOCUMENT_TYPES', ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']);
 
-// Session configuration
+// Session configuration (must be before session_start)
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 0); // Set to 1 for HTTPS
+ini_set('session.cookie_secure', 0); // set 1 if using HTTPS
 ini_set('session.use_strict_mode', 1);
 ini_set('session.cookie_samesite', 'Strict');
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Session timeout (30 minutes)
 define('SESSION_TIMEOUT', 30 * 60);
@@ -61,6 +61,7 @@ define('MAX_PAGE_SIZE', 100);
 
 // Include database configuration
 require_once ADMIN_ROOT . '/config/database.php';
+
 
 /**
  * Autoloader for classes

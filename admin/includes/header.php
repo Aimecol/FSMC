@@ -121,7 +121,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <nav class="sidebar-nav">
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a href="dashboard.php" class="nav-link <?php echo $currentPage === 'dashboard' ? 'active' : ''; ?>">
+                        <a href="index.php" class="nav-link <?php echo $currentPage === 'index' ? 'active' : ''; ?>">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
@@ -171,13 +171,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                         </a>
                     </li>
                     
-                    <li class="nav-item">
-                        <a href="enrollments.php" class="nav-link <?php echo $currentPage === 'enrollments' ? 'active' : ''; ?>">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Enrollments</span>
-                            <span class="badge badge-success">2</span>
-                        </a>
-                    </li>
+
                     
                     <li class="nav-section">
                         <span class="nav-section-title">Media & Files</span>
@@ -241,7 +235,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <nav class="breadcrumb-nav">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="dashboard.php"><i class="fas fa-home"></i> Dashboard</a>
+                        <a href="index.php"><i class="fas fa-home"></i> Dashboard</a>
                     </li>
                     <?php foreach ($breadcrumbs as $crumb): ?>
                         <?php if (isset($crumb['url'])): ?>

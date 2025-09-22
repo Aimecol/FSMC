@@ -1,6 +1,6 @@
-# Fair Surveying & Mapping Company (FSMC) - Admin System
+# Fair Surveying & Mapping Company (FSMC) Website
 
-A comprehensive admin system for managing the Fair Surveying & Mapping Company website, built with PHP, MySQL, and modern web technologies.
+A comprehensive website and admin system for Fair Surveying & Mapping Company, featuring a professional frontend and a complete content management system.
 
 ## Features
 

@@ -9,7 +9,7 @@ require_once 'config/config.php';
 // Verify CSRF token if provided
 if (isset($_GET['token']) && !verifyCSRFToken($_GET['token'])) {
     setErrorMessage('Invalid security token.');
-    redirect(ADMIN_BASE_URL . '/dashboard.php');
+    redirect(ADMIN_BASE_URL . '/index.php');
 }
 
 // Perform logout

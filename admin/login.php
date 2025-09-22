@@ -8,7 +8,7 @@ require_once 'config/config.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
-    redirect(ADMIN_BASE_URL . '/dashboard.php');
+    redirect(ADMIN_BASE_URL . '/index.php');
 }
 
 $error = '';
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $auth->login($username, $password, $rememberMe);
             
             if ($result['success']) {
-                redirect(ADMIN_BASE_URL . '/dashboard.php');
+                redirect(ADMIN_BASE_URL . '/index.php');
             } else {
                 $error = $result['message'];
             }
