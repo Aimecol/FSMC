@@ -1,5 +1,24 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+// Include database configuration and functions
+require_once 'config/database.php';
+require_once 'includes/functions.php';
+
+// Get dynamic content from database
+$featuredServices = getAllRecords('services', '', 'created_at DESC', 6);
+$recentResearch = getAllRecords('research_projects', '', 'created_at DESC', 3);
+$upcomingTraining = getAllRecords('training_programs', '', 'start_date ASC', 3);
+$featuredProducts = getAllRecords('products', '', 'created_at DESC', 4);
+
+// Get statistics
+$stats = [
+    'services' => getRecordCount('services'),
+    'research' => getRecordCount('research_projects'),
+    'training' => getRecordCount('training_programs'),
+    'products' => getRecordCount('products')
+];
+?>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -399,105 +418,65 @@
 
     <section id="services" class="services">
       <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Our Services</h2>
+          <p>Professional surveying, mapping, and technical services with precision and expertise</p>
+        </div>
         <div class="services-grid">
-          <!-- Service Card 1 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>First Registration</h3>
-              <i class="fas fa-file-signature"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
+          <?php if ($featuredServices && count($featuredServices) > 0): ?>
+            <?php foreach ($featuredServices as $service): ?>
+              <div class="service-card" data-aos="fade-up">
+                <div class="service-card-header">
+                  <h3><?php echo htmlspecialchars($service['name']); ?></h3>
+                  <i class="fas fa-<?php echo htmlspecialchars($service['icon'] ?? 'cogs'); ?>"></i>
+                </div>
+                <div class="service-card-content">
+                  <?php if (!empty($service['image'])): ?>
+                    <div class="service-image">
+                      <img src="<?php echo htmlspecialchars($service['image']); ?>"
+                           alt="<?php echo htmlspecialchars($service['name']); ?>" />
+                    </div>
+                  <?php endif; ?>
+                  <div class="service-languages">
+                    <span class="language-tag">
+                      <i class="fas fa-globe"></i> English
+                    </span>
+                    <span class="language-tag">
+                      <i class="fas fa-globe"></i> Kinyarwanda
+                    </span>
+                  </div>
+                  <p><?php echo htmlspecialchars($service['short_description'] ?? substr($service['description'], 0, 150) . '...'); ?></p>
+                  <div class="service-meta">
+                    <?php if (!empty($service['price'])): ?>
+                      <span class="service-price">
+                        <i class="fas fa-tag"></i>
+                        <?php echo number_format($service['price']); ?> RWF
+                      </span>
+                    <?php endif; ?>
+                    <span class="service-status <?php echo strtolower($service['status']); ?>">
+                      <i class="fas fa-circle"></i>
+                      <?php echo htmlspecialchars($service['status']); ?>
+                    </span>
+                  </div>
+                  <div class="service-cta">
+                    <a href="./pages/service_view_more.php?id=<?php echo $service['id']; ?>" class="btn-service">
+                      <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                  </div>
+                </div>
               </div>
-              <p>
-                We offer comprehensive first-time registration services for land
-                parcels, ensuring accurate measurements and legal documentation
-                for your property.
-              </p>
-              <p>
-                Our team uses state-of-the-art equipment to survey your land and
-                prepare all necessary documentation required by land
-                registration authorities.
-              </p>
-              <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="no-services">
+              <i class="fas fa-info-circle"></i>
+              <p>No services available at the moment. Please check back later.</p>
             </div>
-          </div>
-
-          <!-- Service Card 2 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Merging Land Parcels</h3>
-              <i class="fas fa-object-group"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We provide professional services for merging multiple land
-                parcels into a single property, ensuring compliance with all
-                legal requirements.
-              </p>
-              <p>
-                Our experienced surveyors handle the entire process, from
-                initial surveys to final documentation and registration of the
-                merged property.
-              </p>
-              <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 3 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Land Subdivision</h3>
-              <i class="fas fa-cut"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We specialize in dividing land parcels into smaller portions,
-                ensuring accurate measurements and proper documentation for each
-                new parcel.
-              </p>
-              <p>
-                Our team ensures all subdivisions comply with local zoning laws
-                and regulations, providing you with legally recognized property
-                divisions.
-              </p>
-              <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
+        </div>
+        <div class="section-footer" data-aos="fade-up">
+          <a href="./pages/services.php" class="btn-primary">
+            <i class="fas fa-eye"></i> View All Services
+          </a>
         </div>
       </div>
     </section>

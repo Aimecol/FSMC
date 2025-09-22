@@ -5,6 +5,9 @@ session_start();
 require_once '../../../config/database.php';
 require_once '../../../includes/functions.php';
 
+// Initialize security (must be called before any output)
+initializeSecurity();
+
 // Require admin authentication
 requireAdminAuth();
 
@@ -127,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get training categories for dropdown
-$categories = getAllRecords('training_categories', 'name ASC');
+$categories = getAllRecords('training_categories', '', 'name ASC');
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,5 +1,10 @@
 <?php
-// Get current user if not already set
+// Include required files if not already included
+if (!function_exists('getCurrentAdminUser')) {
+    require_once __DIR__ . '/../../../includes/functions.php';
+}
+
+// Get current user if not already set (authentication should be done before including header)
 if (!isset($currentUser)) {
     $currentUser = getCurrentAdminUser();
 }

@@ -279,7 +279,10 @@ function logActivity($user_id, $action, $description) {
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="">
+            <form method="POST" action="" id="loginForm">
+                <!-- CSRF Token -->
+                <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" class="form-control"
@@ -335,5 +338,8 @@ function logActivity($user_id, $action, $description) {
             }
         });
     </script>
+
+    <!-- Validation Script -->
+    <script src="../js/validation.js"></script>
 </body>
 </html>

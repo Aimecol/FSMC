@@ -6,6 +6,176 @@
 
 require_once __DIR__ . '/../config/database.php';
 
+// Include security configuration after database is loaded
+require_once __DIR__ . '/../config/security.php';
+
+// escapeString() function is already declared in config/database.php
+
+/**
+ * Validate email address
+ * @param string $email Email to validate
+ * @return bool True if valid, false otherwise
+ */
+function validateEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
+
+/**
+ * Validate phone number (Rwanda format)
+ * @param string $phone Phone number to validate
+ * @return bool True if valid, false otherwise
+ */
+function validatePhone($phone) {
+    // Remove spaces and special characters
+    $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+    // Check Rwanda phone number patterns
+    $patterns = [
+        '/^(\+250|250)?[0-9]{9}$/',  // +250xxxxxxxxx or 250xxxxxxxxx or xxxxxxxxx
+        '/^07[0-9]{8}$/',            // 07xxxxxxxx
+        '/^08[0-9]{8}$/',            // 08xxxxxxxx
+    ];
+
+    foreach ($patterns as $pattern) {
+        if (preg_match($pattern, $phone)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Validate password strength
+ * @param string $password Password to validate
+ * @return array Validation result with 'valid' boolean and 'errors' array
+ */
+function validatePassword($password) {
+    $errors = [];
+
+    if (strlen($password) < 6) {
+        $errors[] = 'Password must be at least 6 characters long';
+    }
+
+    if (!preg_match('/[A-Z]/', $password)) {
+        $errors[] = 'Password must contain at least one uppercase letter';
+    }
+
+    if (!preg_match('/[a-z]/', $password)) {
+        $errors[] = 'Password must contain at least one lowercase letter';
+    }
+
+    if (!preg_match('/[0-9]/', $password)) {
+        $errors[] = 'Password must contain at least one number';
+    }
+
+    return [
+        'valid' => empty($errors),
+        'errors' => $errors
+    ];
+}
+
+/**
+ * Generate CSRF token
+ * @return string CSRF token
+ */
+function generateCSRFToken() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = $token;
+    return $token;
+}
+
+/**
+ * Verify CSRF token
+ * @param string $token Token to verify
+ * @return bool True if valid, false otherwise
+ */
+function verifyCSRFToken($token) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Rate limiting for login attempts
+ * @param string $identifier User identifier (email or IP)
+ * @param int $maxAttempts Maximum attempts allowed
+ * @param int $timeWindow Time window in seconds
+ * @return bool True if allowed, false if rate limited
+ */
+function checkRateLimit($identifier, $maxAttempts = 5, $timeWindow = 900) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $key = 'rate_limit_' . md5($identifier);
+    $now = time();
+
+    if (!isset($_SESSION[$key])) {
+        $_SESSION[$key] = [];
+    }
+
+    // Remove old attempts outside the time window
+    $_SESSION[$key] = array_filter($_SESSION[$key], function($timestamp) use ($now, $timeWindow) {
+        return ($now - $timestamp) < $timeWindow;
+    });
+
+    // Check if limit exceeded
+    if (count($_SESSION[$key]) >= $maxAttempts) {
+        return false;
+    }
+
+    // Add current attempt
+    $_SESSION[$key][] = $now;
+    return true;
+}
+
+/**
+ * Log security events
+ * @param string $event Event description
+ * @param string $userIdentifier User identifier
+ * @param string $ipAddress IP address
+ * @param array $additionalData Additional data to log
+ */
+function logSecurityEvent($event, $userIdentifier = '', $ipAddress = '', $additionalData = []) {
+    $mysqli = getDatabaseConnection();
+    if (!$mysqli) return;
+
+    $logData = [
+        'event' => $event,
+        'user_identifier' => $userIdentifier,
+        'ip_address' => $ipAddress ?: $_SERVER['REMOTE_ADDR'] ?? '',
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+        'additional_data' => json_encode($additionalData),
+        'created_at' => date('Y-m-d H:i:s')
+    ];
+
+    // Check if security_logs table exists, if not create it
+    $tableExists = $mysqli->query("SHOW TABLES LIKE 'security_logs'");
+    if ($tableExists->num_rows == 0) {
+        $createTable = "
+            CREATE TABLE security_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event VARCHAR(255) NOT NULL,
+                user_identifier VARCHAR(255),
+                ip_address VARCHAR(45),
+                user_agent TEXT,
+                additional_data TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ";
+        $mysqli->query($createTable);
+    }
+
+    insertRecord('security_logs', $logData);
+}
+
 /**
  * Execute a custom SQL query and return results
  * @param string $sql SQL query
@@ -319,13 +489,158 @@ function getImageUrl($filename, $uploadDir = 'uploads/images/', $fallback = 'ima
     if (empty($filename)) {
         return $fallback;
     }
-    
+
     $filepath = $uploadDir . $filename;
     if (file_exists($filepath)) {
         return $filepath;
     }
-    
+
     return $fallback;
+}
+
+/**
+ * Delete image file
+ * @param string $filename Image filename
+ * @param string $uploadDir Upload directory path
+ * @return bool True if deleted successfully, false otherwise
+ */
+function deleteImage($filename, $uploadDir = 'uploads/images/') {
+    if (empty($filename)) {
+        return false;
+    }
+
+    $filepath = $uploadDir . $filename;
+    if (file_exists($filepath)) {
+        return unlink($filepath);
+    }
+
+    return false;
+}
+
+/**
+ * Get image file size in bytes
+ * @param string $filename Image filename
+ * @param string $uploadDir Upload directory path
+ * @return int File size in bytes, 0 if file doesn't exist
+ */
+function getImageFileSize($filename, $uploadDir = 'uploads/images/') {
+    if (empty($filename)) {
+        return 0;
+    }
+
+    $filepath = $uploadDir . $filename;
+    if (file_exists($filepath)) {
+        return filesize($filepath);
+    }
+
+    return 0;
+}
+
+/**
+ * Get formatted file size
+ * @param int $bytes File size in bytes
+ * @return string Formatted file size (e.g., "1.5 MB")
+ */
+function formatFileSize($bytes) {
+    if ($bytes >= 1073741824) {
+        return number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        return number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        return number_format($bytes / 1024, 2) . ' KB';
+    } else {
+        return $bytes . ' bytes';
+    }
+}
+
+/**
+ * Create thumbnail image
+ * @param string $sourcePath Source image path
+ * @param string $thumbnailPath Thumbnail image path
+ * @param int $width Thumbnail width
+ * @param int $height Thumbnail height
+ * @return bool True if thumbnail created successfully, false otherwise
+ */
+function createThumbnail($sourcePath, $thumbnailPath, $width = 150, $height = 150) {
+    if (!file_exists($sourcePath)) {
+        return false;
+    }
+
+    $imageInfo = getimagesize($sourcePath);
+    if (!$imageInfo) {
+        return false;
+    }
+
+    $sourceWidth = $imageInfo[0];
+    $sourceHeight = $imageInfo[1];
+    $mimeType = $imageInfo['mime'];
+
+    // Create source image resource
+    switch ($mimeType) {
+        case 'image/jpeg':
+            $sourceImage = imagecreatefromjpeg($sourcePath);
+            break;
+        case 'image/png':
+            $sourceImage = imagecreatefrompng($sourcePath);
+            break;
+        case 'image/gif':
+            $sourceImage = imagecreatefromgif($sourcePath);
+            break;
+        default:
+            return false;
+    }
+
+    if (!$sourceImage) {
+        return false;
+    }
+
+    // Calculate thumbnail dimensions maintaining aspect ratio
+    $aspectRatio = $sourceWidth / $sourceHeight;
+    if ($width / $height > $aspectRatio) {
+        $width = $height * $aspectRatio;
+    } else {
+        $height = $width / $aspectRatio;
+    }
+
+    // Create thumbnail image
+    $thumbnailImage = imagecreatetruecolor($width, $height);
+
+    // Preserve transparency for PNG and GIF
+    if ($mimeType == 'image/png' || $mimeType == 'image/gif') {
+        imagealphablending($thumbnailImage, false);
+        imagesavealpha($thumbnailImage, true);
+        $transparent = imagecolorallocatealpha($thumbnailImage, 255, 255, 255, 127);
+        imagefilledrectangle($thumbnailImage, 0, 0, $width, $height, $transparent);
+    }
+
+    // Resize image
+    imagecopyresampled($thumbnailImage, $sourceImage, 0, 0, 0, 0, $width, $height, $sourceWidth, $sourceHeight);
+
+    // Create thumbnail directory if it doesn't exist
+    $thumbnailDir = dirname($thumbnailPath);
+    if (!is_dir($thumbnailDir)) {
+        mkdir($thumbnailDir, 0755, true);
+    }
+
+    // Save thumbnail
+    $result = false;
+    switch ($mimeType) {
+        case 'image/jpeg':
+            $result = imagejpeg($thumbnailImage, $thumbnailPath, 85);
+            break;
+        case 'image/png':
+            $result = imagepng($thumbnailImage, $thumbnailPath);
+            break;
+        case 'image/gif':
+            $result = imagegif($thumbnailImage, $thumbnailPath);
+            break;
+    }
+
+    // Clean up memory
+    imagedestroy($sourceImage);
+    imagedestroy($thumbnailImage);
+
+    return $result;
 }
 
 /**

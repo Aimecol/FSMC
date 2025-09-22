@@ -5,6 +5,9 @@ session_start();
 require_once '../../../config/database.php';
 require_once '../../../includes/functions.php';
 
+// Initialize security (must be called before any output)
+initializeSecurity();
+
 // Require admin authentication
 requireAdminAuth();
 
@@ -103,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get service categories for dropdown
-$categories = getAllRecords('service_categories', 'name ASC');
+$categories = getAllRecords('service_categories', '', 'name ASC');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -337,29 +340,67 @@ $categories = getAllRecords('service_categories', 'name ASC');
     <script src="../../js/admin.js"></script>
 
     <script>
-        // Initialize TinyMCE
-        tinymce.init({
-            selector: '.tinymce',
-            height: 300,
-            menubar: false,
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'help', 'wordcount'
-            ],
-            toolbar: 'undo redo | blocks | ' +
-                'bold italic forecolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-        });
+        // Initialize TinyMCE with error handling
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: '.tinymce',
+                height: 300,
+                menubar: false,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        console.log('TinyMCE editor initialized:', editor.id);
+                    });
+                    editor.on('change', function() {
+                        editor.save(); // Save content back to textarea
+                    });
+                },
+                init_instance_callback: function(editor) {
+                    console.log('TinyMCE instance ready:', editor.id);
+                }
+            }).catch(function(error) {
+                console.error('TinyMCE initialization failed:', error);
+                alert('Rich text editor failed to load. You can still use the form, but formatting options will be limited.');
+            });
+        } else {
+            console.error('TinyMCE not loaded');
+            alert('Rich text editor not available. Please check your internet connection.');
+        }
 
         // Form validation
         document.getElementById('serviceForm').addEventListener('submit', function(e) {
             const name = document.getElementById('name').value.trim();
             const shortDescription = document.getElementById('short_description').value.trim();
-            const description = tinymce.get('description').getContent();
             const categoryId = document.getElementById('category_id').value;
+
+            // Get TinyMCE content safely
+            let description = '';
+            let features = '';
+            let requirements = '';
+
+            try {
+                const descEditor = tinymce.get('description');
+                const featuresEditor = tinymce.get('features');
+                const requirementsEditor = tinymce.get('requirements');
+
+                description = descEditor ? descEditor.getContent().trim() : '';
+                features = featuresEditor ? featuresEditor.getContent().trim() : '';
+                requirements = requirementsEditor ? requirementsEditor.getContent().trim() : '';
+            } catch (error) {
+                console.error('Error getting TinyMCE content:', error);
+                e.preventDefault();
+                alert('Error with text editors. Please refresh the page and try again.');
+                return false;
+            }
 
             if (!name) {
                 e.preventDefault();
@@ -383,6 +424,15 @@ $categories = getAllRecords('service_categories', 'name ASC');
                 e.preventDefault();
                 alert('Please select a category.');
                 return false;
+            }
+
+            // Update hidden fields or textareas with TinyMCE content before submission
+            document.getElementById('description').value = description;
+            if (document.getElementById('features')) {
+                document.getElementById('features').value = features;
+            }
+            if (document.getElementById('requirements')) {
+                document.getElementById('requirements').value = requirements;
             }
         });
 

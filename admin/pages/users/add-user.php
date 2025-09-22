@@ -5,6 +5,9 @@ session_start();
 require_once '../../../config/database.php';
 require_once '../../../includes/functions.php';
 
+// Initialize security (must be called before any output)
+initializeSecurity();
+
 // Require admin authentication
 requireAdminAuth();
 

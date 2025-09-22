@@ -5,6 +5,9 @@ session_start();
 require_once '../../../config/database.php';
 require_once '../../../includes/functions.php';
 
+// Initialize security (must be called before any output)
+initializeSecurity();
+
 // Require admin authentication
 requireAdminAuth();
 
@@ -118,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get research categories for dropdown
-$categories = getAllRecords('research_categories', 'name ASC');
+$categories = getAllRecords('research_categories', '', 'name ASC');
 ?>
 <!DOCTYPE html>
 <html lang="en">
