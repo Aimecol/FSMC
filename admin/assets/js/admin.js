@@ -179,23 +179,23 @@ window.Admin = {
         });
         
         // Delete confirmations
-        document.querySelectorAll('.btn-delete').forEach(function(deleteBtn) {
-            deleteBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+        // document.querySelectorAll('.btn-delete').forEach(function(deleteBtn) {
+        //     deleteBtn.addEventListener('click', function(e) {
+        //         e.preventDefault();
                 
-                const url = this.href || this.dataset.url;
-                const itemName = this.dataset.name || 'this item';
+        //         const url = this.href || this.dataset.url;
+        //         const itemName = this.dataset.name || 'this item';
                 
-                Admin.confirmAction(
-                    `Are you sure you want to delete "${itemName}"? This action cannot be undone.`,
-                    function() {
-                        if (url) {
-                            window.location.href = url;
-                        }
-                    }
-                );
-            });
-        });
+        //         Admin.confirmAction(
+        //             `Are you sure you want to delete "${itemName}"? This action cannot be undone.`,
+        //             function() {
+        //                 if (url) {
+        //                     window.location.href = url;
+        //                 }
+        //             }
+        //         );
+        //     });
+        // });
     },
     
     // Table functionality

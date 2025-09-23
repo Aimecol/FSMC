@@ -5,6 +5,24 @@
  */
 
 require_once 'config/config.php';
+require_once 'includes/image_upload.php';
+
+// Helper function to safely process array fields
+function processArrayField($postData, $fieldName) {
+    if (!isset($postData[$fieldName])) {
+        return [];
+    }
+
+    $value = $postData[$fieldName];
+
+    if (is_array($value)) {
+        return array_filter(array_map('sanitize', $value));
+    } elseif (is_string($value) && !empty($value)) {
+        return array_filter(array_map('sanitize', explode(',', $value)));
+    }
+
+    return [];
+}
 
 $researchId = intval($_GET['id'] ?? 0);
 $isEdit = $researchId > 0;
@@ -33,23 +51,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
         setErrorMessage('Invalid security token.');
     } else {
+        // Handle image upload
+        $imageUploadResult = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $imageUploadResult = handleImageUpload('image', 'images/research');
+            if (!$imageUploadResult['success']) {
+                $errors[] = 'Image upload failed: ' . $imageUploadResult['error'];
+            }
+        }
+
         $data = [
             'title' => sanitize($_POST['title'] ?? ''),
             'slug' => sanitize($_POST['slug'] ?? ''),
             'abstract' => sanitize($_POST['abstract'] ?? ''),
+            'description' => sanitize($_POST['description'] ?? ''),
             'methodology' => sanitize($_POST['methodology'] ?? ''),
-            'findings' => sanitize($_POST['findings'] ?? ''),
-            'category' => sanitize($_POST['category'] ?? ''),
-            'authors' => sanitize($_POST['authors'] ?? ''),
+            'key_findings' => json_encode([sanitize($_POST['key_findings'] ?? '')]),
+            'authors' => json_encode(processArrayField($_POST, 'authors')),
             'publication_date' => !empty($_POST['publication_date']) ? $_POST['publication_date'] : null,
             'journal' => sanitize($_POST['journal'] ?? ''),
-            'volume' => sanitize($_POST['volume'] ?? ''),
-            'issue' => sanitize($_POST['issue'] ?? ''),
-            'pages' => sanitize($_POST['pages'] ?? ''),
             'doi' => sanitize($_POST['doi'] ?? ''),
-            'keywords' => json_encode(array_filter(array_map('sanitize', $_POST['keywords'] ?? []))),
+            'keywords' => json_encode(processArrayField($_POST, 'keywords')),
+            'category' => sanitize($_POST['category'] ?? ''),
             'status' => sanitize($_POST['status'] ?? 'draft'),
-            'sort_order' => intval($_POST['sort_order'] ?? 0),
+            'featured' => isset($_POST['featured']) ? 1 : 0,
+            'image' => $imageUploadResult && $imageUploadResult['success'] ? $imageUploadResult['file_path'] : (sanitize($_POST['current_image'] ?? '') ?: ''),
+            'gallery' => json_encode(processArrayField($_POST, 'gallery')),
+            'documents' => json_encode(processArrayField($_POST, 'documents')),
             'meta_title' => sanitize($_POST['meta_title'] ?? ''),
             'meta_description' => sanitize($_POST['meta_description'] ?? '')
         ];
@@ -86,12 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if ($isEdit) {
                     // Update research project
-                    $sql = "UPDATE research_projects SET 
-                            title = ?, slug = ?, abstract = ?, methodology = ?, findings = ?, 
-                            category = ?, authors = ?, publication_date = ?, journal = ?, 
-                            volume = ?, issue = ?, pages = ?, doi = ?, keywords = ?, 
-                            status = ?, sort_order = ?, meta_title = ?, meta_description = ?, 
-                            updated_at = NOW() 
+                    $sql = "UPDATE research_projects SET
+                            title = ?, slug = ?, abstract = ?, description = ?, methodology = ?, key_findings = ?,
+                            authors = ?, publication_date = ?, journal = ?, doi = ?, keywords = ?,
+                            category = ?, status = ?, featured = ?, image = ?, gallery = ?, documents = ?,
+                            meta_title = ?, meta_description = ?, updated_at = NOW()
                             WHERE id = ?";
                     
                     $params = array_values($data);
@@ -106,11 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // Create new research project
-                    $sql = "INSERT INTO research_projects 
-                            (title, slug, abstract, methodology, findings, category, authors, 
-                             publication_date, journal, volume, issue, pages, doi, keywords, 
-                             status, sort_order, meta_title, meta_description) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO research_projects
+                            (title, slug, abstract, description, methodology, key_findings, authors,
+                             publication_date, journal, doi, keywords, category, status, featured,
+                             image, gallery, documents, meta_title, meta_description)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     
                     $newId = dbInsert($sql, array_values($data));
                     if ($newId) {
@@ -138,19 +165,20 @@ $formData = $research ?: [
     'title' => '',
     'slug' => '',
     'abstract' => '',
+    'description' => '',
     'methodology' => '',
-    'findings' => '',
-    'category' => '',
-    'authors' => '',
+    'key_findings' => '[]',
+    'authors' => '[]',
     'publication_date' => '',
     'journal' => '',
-    'volume' => '',
-    'issue' => '',
-    'pages' => '',
     'doi' => '',
     'keywords' => '[]',
+    'category' => '',
     'status' => 'draft',
-    'sort_order' => 0,
+    'featured' => 0,
+    'image' => '',
+    'gallery' => '[]',
+    'documents' => '[]',
     'meta_title' => '',
     'meta_description' => ''
 ];
@@ -178,7 +206,7 @@ $statuses = [
 include 'includes/header.php';
 ?>
 
-<form method="POST" data-validate>
+<form method="POST" enctype="multipart/form-data" data-validate>
     <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
     
     <div class="row">
@@ -243,9 +271,9 @@ include 'includes/header.php';
                     </div>
                     
                     <div class="form-group">
-                        <label for="findings" class="form-label">Key Findings</label>
-                        <textarea id="findings" name="findings" class="form-control" 
-                                  rows="6"><?php echo htmlspecialchars($formData['findings']); ?></textarea>
+                        <label for="key_findings" class="form-label">Key Findings</label>
+                        <textarea id="key_findings" name="key_findings" class="form-control"
+                                  rows="6"><?php echo htmlspecialchars($formData['key_findings']); ?></textarea>
                         <div class="form-text">Main results and conclusions.</div>
                     </div>
                 </div>
@@ -275,29 +303,36 @@ include 'includes/header.php';
                         </div>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="description" class="form-label required">Description</label>
+                        <textarea id="description" name="description" class="form-control"
+                                  rows="4" required><?php echo htmlspecialchars($formData['description']); ?></textarea>
+                        <div class="form-text">Detailed description of the research project.</div>
+                    </div>
+
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="form-group">
-                                <label for="volume" class="form-label">Volume</label>
-                                <input type="text" id="volume" name="volume" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['volume']); ?>" 
-                                       placeholder="e.g., 45">
+                                <label for="category" class="form-label">Category</label>
+                                <select id="category" name="category" class="form-control">
+                                    <option value="">Select Category</option>
+                                    <option value="surveying" <?php echo $formData['category'] === 'surveying' ? 'selected' : ''; ?>>Surveying</option>
+                                    <option value="mapping" <?php echo $formData['category'] === 'mapping' ? 'selected' : ''; ?>>Mapping</option>
+                                    <option value="gis" <?php echo $formData['category'] === 'gis' ? 'selected' : ''; ?>>GIS</option>
+                                    <option value="remote_sensing" <?php echo $formData['category'] === 'remote_sensing' ? 'selected' : ''; ?>>Remote Sensing</option>
+                                    <option value="cartography" <?php echo $formData['category'] === 'cartography' ? 'selected' : ''; ?>>Cartography</option>
+                                    <option value="geodesy" <?php echo $formData['category'] === 'geodesy' ? 'selected' : ''; ?>>Geodesy</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="form-group">
-                                <label for="issue" class="form-label">Issue</label>
-                                <input type="text" id="issue" name="issue" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['issue']); ?>" 
-                                       placeholder="e.g., 3">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label for="pages" class="form-label">Pages</label>
-                                <input type="text" id="pages" name="pages" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['pages']); ?>" 
-                                       placeholder="e.g., 123-145">
+                                <label class="form-label">
+                                    <input type="checkbox" name="featured" value="1"
+                                           <?php echo $formData['featured'] ? 'checked' : ''; ?>>
+                                    Featured Research
+                                </label>
+                                <div class="form-text">Mark as featured research project.</div>
                             </div>
                         </div>
                     </div>
@@ -367,11 +402,36 @@ include 'includes/header.php';
                     </div>
                     
                     <div class="form-group">
-                        <label for="sort_order" class="form-label">Sort Order</label>
-                        <input type="number" id="sort_order" name="sort_order" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['sort_order']); ?>" 
-                               min="0">
-                        <div class="form-text">Lower numbers appear first.</div>
+                        <label for="image" class="form-label">Featured Image</label>
+
+                        <?php if (!empty($formData['image'])): ?>
+                            <div class="current-image mb-3">
+                                <img src="<?php echo getFileUrl($formData['image']); ?>"
+                                     alt="Current image"
+                                     style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                                <div class="mt-2">
+                                    <small class="text-muted">Current image</small>
+                                    <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($formData['image']); ?>">
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <input type="file" id="image" name="image" class="form-control"
+                               accept="image/*" onchange="previewImage(this)">
+                        <div class="form-text">
+                            Upload a new image (JPG, PNG, GIF, WebP). Maximum size: 5MB.
+                            <?php if (!empty($formData['image'])): ?>
+                                Leave empty to keep current image.
+                            <?php endif; ?>
+                        </div>
+
+                        <div id="image-preview" class="mt-3" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview"
+                                 style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                            <div class="mt-2">
+                                <small class="text-muted">New image preview</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer">
@@ -454,6 +514,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+    }
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>

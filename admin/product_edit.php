@@ -5,6 +5,24 @@
  */
 
 require_once 'config/config.php';
+require_once 'includes/image_upload.php';
+
+// Helper function to safely process array fields
+function processArrayField($postData, $fieldName) {
+    if (!isset($postData[$fieldName])) {
+        return [];
+    }
+
+    $value = $postData[$fieldName];
+
+    if (is_array($value)) {
+        return array_filter(array_map('sanitize', $value));
+    } elseif (is_string($value) && !empty($value)) {
+        return array_filter(array_map('sanitize', explode(',', $value)));
+    }
+
+    return [];
+}
 
 $productId = intval($_GET['id'] ?? 0);
 $isEdit = $productId > 0;
@@ -33,6 +51,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
         setErrorMessage('Invalid security token.');
     } else {
+        // Handle image upload
+        $imageUploadResult = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $imageUploadResult = handleImageUpload('image', 'images/products');
+            if (!$imageUploadResult['success']) {
+                $errors[] = 'Image upload failed: ' . $imageUploadResult['error'];
+            }
+        }
+
         $data = [
             'title' => sanitize($_POST['title'] ?? ''),
             'slug' => sanitize($_POST['slug'] ?? ''),
@@ -41,11 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'category' => sanitize($_POST['category'] ?? ''),
             'manufacturer' => sanitize($_POST['manufacturer'] ?? ''),
             'model' => sanitize($_POST['model'] ?? ''),
-            'specifications' => json_encode(array_filter(array_map('sanitize', $_POST['specifications'] ?? []))),
+            'specifications' => json_encode(processArrayField($_POST, 'specifications')),
             'price' => !empty($_POST['price']) ? floatval($_POST['price']) : null,
             'warranty' => sanitize($_POST['warranty'] ?? ''),
             'support' => sanitize($_POST['support'] ?? ''),
             'icon' => sanitize($_POST['icon'] ?? ''),
+            'image' => $imageUploadResult && $imageUploadResult['success'] ? $imageUploadResult['file_path'] : (sanitize($_POST['current_image'] ?? '') ?: ''),
             'status' => sanitize($_POST['status'] ?? 'active'),
             'sort_order' => intval($_POST['sort_order'] ?? 0),
             'meta_title' => sanitize($_POST['meta_title'] ?? ''),
@@ -165,7 +193,7 @@ $categories = [
 include 'includes/header.php';
 ?>
 
-<form method="POST" data-validate>
+<form method="POST" enctype="multipart/form-data" data-validate>
     <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
     
     <div class="row">
@@ -364,7 +392,48 @@ include 'includes/header.php';
                     <?php endif; ?>
                 </div>
             </div>
-            
+
+            <!-- Product Image -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Product Image</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="image" class="form-label">Featured Image</label>
+
+                        <?php if (!empty($formData['image'])): ?>
+                            <div class="current-image mb-3">
+                                <img src="<?php echo getFileUrl($formData['image']); ?>"
+                                     alt="Current image"
+                                     style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                                <div class="mt-2">
+                                    <small class="text-muted">Current image</small>
+                                    <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($formData['image']); ?>">
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <input type="file" id="image" name="image" class="form-control"
+                               accept="image/*" onchange="previewImage(this)">
+                        <div class="form-text">
+                            Upload a new image (JPG, PNG, GIF, WebP). Maximum size: 5MB.
+                            <?php if (!empty($formData['image'])): ?>
+                                Leave empty to keep current image.
+                            <?php endif; ?>
+                        </div>
+
+                        <div id="image-preview" class="mt-3" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview"
+                                 style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                            <div class="mt-2">
+                                <small class="text-muted">New image preview</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- SEO -->
             <div class="card">
                 <div class="card-header">
@@ -445,6 +514,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+    }
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>

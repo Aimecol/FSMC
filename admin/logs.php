@@ -320,9 +320,9 @@ include 'includes/header.php';
                                 <small><?php echo htmlspecialchars($log['ip_address'] ?? '-'); ?></small>
                             </td>
                             <td>
-                                <?php if ($log['description']): ?>
-                                    <button type="button" class="btn btn-sm btn-outline-info btn-details" 
-                                            data-description="<?php echo htmlspecialchars($log['description']); ?>"
+                                <?php if (!empty($log['description'])): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-info btn-details"
+                                            data-description="<?php echo htmlspecialchars($log['description'] ?? ''); ?>"
                                             data-old-data="<?php echo htmlspecialchars($log['old_data'] ?? ''); ?>"
                                             data-new-data="<?php echo htmlspecialchars($log['new_data'] ?? ''); ?>">
                                         <i class="fas fa-eye"></i>

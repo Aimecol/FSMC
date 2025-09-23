@@ -94,10 +94,10 @@ $totalProjects = $totalResult['total'] ?? 0;
 $totalPages = ceil($totalProjects / $limit);
 
 // Get research projects
-$projectsQuery = "SELECT id, title, slug, abstract, category, authors, publication_date, 
-                         journal, doi, status, sort_order, created_at, updated_at 
-                  FROM research_projects $whereClause 
-                  ORDER BY publication_date DESC, sort_order ASC, created_at DESC 
+$projectsQuery = "SELECT id, title, slug, abstract, category, authors, publication_date,
+                         journal, doi, status, created_at, updated_at
+                  FROM research_projects $whereClause
+                  ORDER BY publication_date DESC, created_at DESC
                   LIMIT $limit OFFSET $offset";
 $projects = dbGetRows($projectsQuery, $params);
 
@@ -229,7 +229,7 @@ include 'includes/header.php';
                                 </span>
                             </td>
                             <td>
-                                <span class="badge badge-info"><?php echo $project['sort_order']; ?></span>
+                                <span class="badge badge-info"><?php echo $project['id']; ?></span>
                             </td>
                             <td>
                                 <small><?php echo date('M j, Y', strtotime($project['created_at'])); ?></small>

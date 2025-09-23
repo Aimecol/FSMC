@@ -134,7 +134,16 @@ try {
     
     echo "<h3>Database Setup Complete!</h3>";
     echo "<p><a href='test_db.php'>Run Database Test</a></p>";
+    echo "<p><a href='test_pages.php'>Test Admin Pages</a></p>";
     echo "<p><a href='index.php'>Go to Admin Dashboard</a></p>";
+
+    // Test the problematic pages
+    echo "<h3>Test Problematic Pages</h3>";
+    echo "<ul>";
+    echo "<li><a href='inquiries.php' target='_blank'>Test Inquiries Page</a></li>";
+    echo "<li><a href='media.php' target='_blank'>Test Media Page</a></li>";
+    echo "<li><a href='logs.php' target='_blank'>Test Logs Page</a></li>";
+    echo "</ul>";
     
 } catch (Exception $e) {
     echo "<p style='color: red;'>✗ Error: " . $e->getMessage() . "</p>";

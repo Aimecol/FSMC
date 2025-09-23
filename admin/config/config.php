@@ -189,6 +189,17 @@ function getCurrentUser() {
 }
 
 /**
+ * Get current user ID
+ */
+function getCurrentUserId() {
+    if (!isLoggedIn()) {
+        return null;
+    }
+
+    return $_SESSION['admin_user_id'] ?? null;
+}
+
+/**
  * Check user permission
  */
 function hasPermission($permission) {
@@ -301,18 +312,23 @@ function getErrorMessage() {
 /**
  * Get company setting
  */
-function getSetting($key, $default = null) {
+function getSetting($key, $default = '') {
     static $settings = null;
-    
+
     if ($settings === null) {
-        $rows = dbGetRows("SELECT setting_key, setting_value FROM company_settings");
-        $settings = [];
-        foreach ($rows as $row) {
-            $settings[$row['setting_key']] = $row['setting_value'];
+        try {
+            $rows = dbGetRows("SELECT setting_key, setting_value FROM settings");
+            $settings = [];
+            foreach ($rows as $row) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+        } catch (Exception $e) {
+            error_log("Failed to get settings: " . $e->getMessage());
+            $settings = [];
         }
     }
-    
-    return isset($settings[$key]) ? $settings[$key] : $default;
+
+    return isset($settings[$key]) ? ($settings[$key] ?? $default) : $default;
 }
 
 /**
@@ -391,4 +407,15 @@ set_exception_handler(function($exception) {
     error_log("Uncaught exception: " . $exception->getMessage() . " in " . $exception->getFile() . " on line " . $exception->getLine());
     die("A system error occurred. Please contact the administrator.");
 });
+
+/**
+ * Get file URL by file path
+ */
+function getFileUrl($filePath) {
+    if (empty($filePath)) {
+        return '';
+    }
+
+    return UPLOAD_URL . '/' . ltrim($filePath, '/');
+}
 ?>

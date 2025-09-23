@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params = [$username, $email, $fullName, $role, $status];
                 
                 if (!empty($password)) {
-                    $sql .= ", password = ?";
+                    $sql .= ", password_hash = ?";
                     $params[] = password_hash($password, PASSWORD_DEFAULT);
                     $updateData['password_changed'] = true;
                 }
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Create new user
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
-                $sql = "INSERT INTO admin_users (username, email, full_name, password, role, status) 
+                $sql = "INSERT INTO admin_users (username, email, full_name, password_hash, role, status)
                         VALUES (?, ?, ?, ?, ?, ?)";
                 $params = [$username, $email, $fullName, $hashedPassword, $role, $status];
                 

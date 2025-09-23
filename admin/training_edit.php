@@ -5,6 +5,24 @@
  */
 
 require_once 'config/config.php';
+require_once 'includes/image_upload.php';
+
+// Helper function to safely process array fields
+function processArrayField($postData, $fieldName) {
+    if (!isset($postData[$fieldName])) {
+        return [];
+    }
+
+    $value = $postData[$fieldName];
+
+    if (is_array($value)) {
+        return array_filter(array_map('sanitize', $value));
+    } elseif (is_string($value) && !empty($value)) {
+        return array_filter(array_map('sanitize', explode(',', $value)));
+    }
+
+    return [];
+}
 
 $trainingId = intval($_GET['id'] ?? 0);
 $isEdit = $trainingId > 0;
@@ -33,21 +51,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
         setErrorMessage('Invalid security token.');
     } else {
+        // Handle image upload
+        $imageUploadResult = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $imageUploadResult = handleImageUpload('image', 'images/training');
+            if (!$imageUploadResult['success']) {
+                $errors[] = 'Image upload failed: ' . $imageUploadResult['error'];
+            }
+        }
+
         $data = [
             'title' => sanitize($_POST['title'] ?? ''),
             'slug' => sanitize($_POST['slug'] ?? ''),
             'description' => sanitize($_POST['description'] ?? ''),
             'short_description' => sanitize($_POST['short_description'] ?? ''),
-            'level' => sanitize($_POST['level'] ?? ''),
-            'instructor' => sanitize($_POST['instructor'] ?? ''),
+            'category' => sanitize($_POST['category'] ?? ''),
+            'price' => !empty($_POST['price']) ? floatval($_POST['price']) : 0,
             'duration' => sanitize($_POST['duration'] ?? ''),
-            'price' => !empty($_POST['price']) ? floatval($_POST['price']) : null,
-            'max_participants' => !empty($_POST['max_participants']) ? intval($_POST['max_participants']) : null,
-            'start_date' => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
-            'end_date' => !empty($_POST['end_date']) ? $_POST['end_date'] : null,
-            'schedule' => sanitize($_POST['schedule'] ?? ''),
-            'curriculum' => json_encode(array_filter(array_map('sanitize', $_POST['curriculum'] ?? []))),
-            'requirements' => json_encode(array_filter(array_map('sanitize', $_POST['requirements'] ?? []))),
+            'max_students' => !empty($_POST['max_students']) ? intval($_POST['max_students']) : 20,
+            'language' => sanitize($_POST['language'] ?? 'English'),
+            'level' => sanitize($_POST['level'] ?? 'beginner'),
+            'features' => json_encode(processArrayField($_POST, 'features')),
+            'curriculum' => json_encode(processArrayField($_POST, 'curriculum')),
+            'requirements' => sanitize($_POST['requirements'] ?? ''),
+            'image' => $imageUploadResult && $imageUploadResult['success'] ? $imageUploadResult['file_path'] : (sanitize($_POST['current_image'] ?? '') ?: ''),
+            'gallery' => json_encode(processArrayField($_POST, 'gallery')),
+            'instructor' => sanitize($_POST['instructor'] ?? ''),
             'status' => sanitize($_POST['status'] ?? 'active'),
             'sort_order' => intval($_POST['sort_order'] ?? 0),
             'meta_title' => sanitize($_POST['meta_title'] ?? ''),
@@ -73,11 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Level is required.';
         }
         
-        // Validate dates
-        if ($data['start_date'] && $data['end_date']) {
-            if (strtotime($data['end_date']) < strtotime($data['start_date'])) {
-                $errors[] = 'End date must be after start date.';
-            }
+        // Validate category
+        if (empty($data['category'])) {
+            $errors[] = 'Category is required.';
         }
         
         // Check for duplicate slug
@@ -93,12 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if ($isEdit) {
                     // Update training program
-                    $sql = "UPDATE training_programs SET 
-                            title = ?, slug = ?, description = ?, short_description = ?, 
-                            level = ?, instructor = ?, duration = ?, price = ?, max_participants = ?, 
-                            start_date = ?, end_date = ?, schedule = ?, curriculum = ?, requirements = ?, 
-                            status = ?, sort_order = ?, meta_title = ?, meta_description = ?, 
-                            updated_at = NOW() 
+                    $sql = "UPDATE training_programs SET
+                            title = ?, slug = ?, description = ?, short_description = ?, category = ?,
+                            price = ?, duration = ?, max_students = ?, language = ?, level = ?,
+                            features = ?, curriculum = ?, requirements = ?, image = ?, gallery = ?,
+                            instructor = ?, status = ?, sort_order = ?, meta_title = ?, meta_description = ?,
+                            updated_at = NOW()
                             WHERE id = ?";
                     
                     $params = array_values($data);
@@ -113,11 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // Create new training program
-                    $sql = "INSERT INTO training_programs 
-                            (title, slug, description, short_description, level, instructor, 
-                             duration, price, max_participants, start_date, end_date, schedule, 
-                             curriculum, requirements, status, sort_order, meta_title, meta_description) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO training_programs
+                            (title, slug, description, short_description, category, price, duration,
+                             max_students, language, level, features, curriculum, requirements,
+                             image, gallery, instructor, status, sort_order, meta_title, meta_description)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     
                     $newId = dbInsert($sql, array_values($data));
                     if ($newId) {
@@ -146,16 +173,18 @@ $formData = $training ?: [
     'slug' => '',
     'description' => '',
     'short_description' => '',
-    'level' => '',
-    'instructor' => '',
-    'duration' => '',
+    'category' => '',
     'price' => '',
-    'max_participants' => '',
-    'start_date' => '',
-    'end_date' => '',
-    'schedule' => '',
+    'duration' => '',
+    'max_students' => 20,
+    'language' => 'English',
+    'level' => 'beginner',
+    'features' => '[]',
     'curriculum' => '[]',
-    'requirements' => '[]',
+    'requirements' => '',
+    'image' => '',
+    'gallery' => '[]',
+    'instructor' => '',
     'status' => 'active',
     'sort_order' => 0,
     'meta_title' => '',
@@ -177,7 +206,7 @@ $levels = [
 include 'includes/header.php';
 ?>
 
-<form method="POST" data-validate>
+<form method="POST" enctype="multipart/form-data" data-validate>
     <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
     
     <div class="row">
@@ -247,9 +276,9 @@ include 'includes/header.php';
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="max_participants" class="form-label">Max Participants</label>
-                                <input type="number" id="max_participants" name="max_participants" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['max_participants']); ?>" 
+                                <label for="max_students" class="form-label">Max Students</label>
+                                <input type="number" id="max_students" name="max_students" class="form-control"
+                                       value="<?php echo htmlspecialchars($formData['max_students']); ?>"
                                        min="1">
                             </div>
                         </div>
@@ -258,25 +287,61 @@ include 'includes/header.php';
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" id="start_date" name="start_date" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['start_date']); ?>">
+                                <label for="category" class="form-label required">Category</label>
+                                <select id="category" name="category" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <option value="surveying" <?php echo $formData['category'] === 'surveying' ? 'selected' : ''; ?>>Surveying</option>
+                                    <option value="mapping" <?php echo $formData['category'] === 'mapping' ? 'selected' : ''; ?>>Mapping</option>
+                                    <option value="gis" <?php echo $formData['category'] === 'gis' ? 'selected' : ''; ?>>GIS</option>
+                                    <option value="remote_sensing" <?php echo $formData['category'] === 'remote_sensing' ? 'selected' : ''; ?>>Remote Sensing</option>
+                                    <option value="cartography" <?php echo $formData['category'] === 'cartography' ? 'selected' : ''; ?>>Cartography</option>
+                                    <option value="geodesy" <?php echo $formData['category'] === 'geodesy' ? 'selected' : ''; ?>>Geodesy</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" id="end_date" name="end_date" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['end_date']); ?>">
+                                <label for="language" class="form-label">Language</label>
+                                <select id="language" name="language" class="form-control">
+                                    <option value="English" <?php echo $formData['language'] === 'English' ? 'selected' : ''; ?>>English</option>
+                                    <option value="French" <?php echo $formData['language'] === 'French' ? 'selected' : ''; ?>>French</option>
+                                    <option value="Kinyarwanda" <?php echo $formData['language'] === 'Kinyarwanda' ? 'selected' : ''; ?>>Kinyarwanda</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="schedule" class="form-label">Schedule</label>
-                        <input type="text" id="schedule" name="schedule" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['schedule']); ?>" 
-                               placeholder="e.g., Mon-Fri 9:00-17:00, Weekends 8:00-16:00">
+                        <label for="image" class="form-label">Featured Image</label>
+
+                        <?php if (!empty($formData['image'])): ?>
+                            <div class="current-image mb-3">
+                                <img src="<?php echo getFileUrl($formData['image']); ?>"
+                                     alt="Current image"
+                                     style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                                <div class="mt-2">
+                                    <small class="text-muted">Current image</small>
+                                    <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($formData['image']); ?>">
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <input type="file" id="image" name="image" class="form-control"
+                               accept="image/*" onchange="previewImage(this)">
+                        <div class="form-text">
+                            Upload a new image (JPG, PNG, GIF, WebP). Maximum size: 5MB.
+                            <?php if (!empty($formData['image'])): ?>
+                                Leave empty to keep current image.
+                            <?php endif; ?>
+                        </div>
+
+                        <div id="image-preview" class="mt-3" style="display: none;">
+                            <img id="preview-img" src="" alt="Preview"
+                                 style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
+                            <div class="mt-2">
+                                <small class="text-muted">New image preview</small>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -492,6 +557,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+    }
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>
