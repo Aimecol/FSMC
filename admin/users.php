@@ -285,13 +285,13 @@ include 'includes/header.php';
                         </li>
                     <?php endif; ?>
                     
-                    <?php foreach ($pages as $i): ?>
+                    <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
                         <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
                             <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&role=<?php echo urlencode($role); ?>&status=<?php echo urlencode($status); ?>">
                                 <?php echo $i; ?>
                             </a>
                         </li>
-                    <?php endforeach; ?>
+                    <?php endfor; ?>
                     
                     <?php if ($page < $totalPages): ?>
                         <li class="page-item">

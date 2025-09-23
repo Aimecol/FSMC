@@ -11,41 +11,85 @@ $pageTitle = 'Dashboard';
 $pageIcon = 'fas fa-tachometer-alt';
 $pageDescription = 'Overview of your website statistics and recent activity';
 
-// Get dashboard statistics
-$stats = [
-    'services' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'active' THEN 1 END) as active FROM services")['total'] ?? 0,
-    'products' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'active' THEN 1 END) as active FROM products")['total'] ?? 0,
-    'training' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'active' THEN 1 END) as active FROM training_programs")['total'] ?? 0,
-    'research' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'published' THEN 1 END) as published FROM research_projects")['total'] ?? 0,
-    'inquiries' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'new' THEN 1 END) as new FROM contact_inquiries")['total'] ?? 0,
-    'enrollments' => dbGetRow("SELECT COUNT(*) as total, COUNT(CASE WHEN enrollment_status = 'pending' THEN 1 END) as pending FROM training_enrollments")['total'] ?? 0
-];
+// Get dashboard statistics with error handling
+$stats = [];
 
-// Get recent activity
-$recentInquiries = dbGetRows(
-    "SELECT id, name, email, subject, type, status, created_at 
-     FROM contact_inquiries 
-     ORDER BY created_at DESC 
-     LIMIT 5"
-);
+try {
+    $stats['services'] = dbGetValue("SELECT COUNT(*) FROM services") ?? 0;
+} catch (Exception $e) {
+    $stats['services'] = 0;
+}
 
-$recentEnrollments = dbGetRows(
-    "SELECT e.id, e.name, e.email, e.enrollment_status, e.created_at, 
-            tp.title as program_title
-     FROM training_enrollments e
-     JOIN training_schedules ts ON e.schedule_id = ts.id
-     JOIN training_programs tp ON ts.program_id = tp.id
-     ORDER BY e.created_at DESC 
-     LIMIT 5"
-);
+try {
+    $stats['products'] = dbGetValue("SELECT COUNT(*) FROM products") ?? 0;
+} catch (Exception $e) {
+    $stats['products'] = 0;
+}
 
-$recentActivity = dbGetRows(
-    "SELECT al.action, al.table_name, al.created_at, au.full_name
-     FROM activity_logs al
-     LEFT JOIN admin_users au ON al.user_id = au.id
-     ORDER BY al.created_at DESC
-     LIMIT 10"
-);
+try {
+    $stats['training'] = dbGetValue("SELECT COUNT(*) FROM training_programs") ?? 0;
+} catch (Exception $e) {
+    $stats['training'] = 0;
+}
+
+try {
+    $stats['research'] = dbGetValue("SELECT COUNT(*) FROM research_projects") ?? 0;
+} catch (Exception $e) {
+    $stats['research'] = 0;
+}
+
+try {
+    $stats['inquiries'] = dbGetValue("SELECT COUNT(*) FROM inquiries") ?? 0;
+} catch (Exception $e) {
+    $stats['inquiries'] = 0;
+}
+
+try {
+    $stats['enrollments'] = dbGetValue("SELECT COUNT(*) FROM training_enrollments") ?? 0;
+} catch (Exception $e) {
+    $stats['enrollments'] = 0;
+}
+
+// Get recent activity with error handling
+$recentInquiries = [];
+try {
+    $recentInquiries = dbGetRows(
+        "SELECT id, name, email, subject, type, status, created_at
+         FROM inquiries
+         ORDER BY created_at DESC
+         LIMIT 5"
+    ) ?? [];
+} catch (Exception $e) {
+    $recentInquiries = [];
+}
+
+$recentEnrollments = [];
+try {
+    $recentEnrollments = dbGetRows(
+        "SELECT e.id, e.name, e.email, e.enrollment_status, e.created_at,
+                tp.title as program_title
+         FROM training_enrollments e
+         JOIN training_schedules ts ON e.schedule_id = ts.id
+         JOIN training_programs tp ON ts.program_id = tp.id
+         ORDER BY e.created_at DESC
+         LIMIT 5"
+    ) ?? [];
+} catch (Exception $e) {
+    $recentEnrollments = [];
+}
+
+$recentActivity = [];
+try {
+    $recentActivity = dbGetRows(
+        "SELECT al.action, al.table_name, al.created_at, au.full_name
+         FROM activity_logs al
+         LEFT JOIN admin_users au ON al.user_id = au.id
+         ORDER BY al.created_at DESC
+         LIMIT 10"
+    ) ?? [];
+} catch (Exception $e) {
+    $recentActivity = [];
+}
 
 include 'includes/header.php';
 ?>

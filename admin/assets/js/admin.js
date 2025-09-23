@@ -114,14 +114,30 @@ window.Admin = {
     
     // Modal functionality
     initModals: function() {
+        // Modal trigger functionality
+        document.querySelectorAll('[data-toggle="modal"]').forEach(function(trigger) {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSelector = this.getAttribute('data-target');
+                if (targetSelector) {
+                    const modal = document.querySelector(targetSelector);
+                    if (modal) {
+                        modal.classList.add('show');
+                    }
+                }
+            });
+        });
+
         // Close modal functionality
         document.querySelectorAll('[data-dismiss="modal"]').forEach(function(closeBtn) {
             closeBtn.addEventListener('click', function() {
                 const modal = this.closest('.modal');
-                modal.classList.remove('show');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
             });
         });
-        
+
         // Close modal when clicking backdrop
         document.querySelectorAll('.modal').forEach(function(modal) {
             modal.addEventListener('click', function(e) {
@@ -130,7 +146,7 @@ window.Admin = {
                 }
             });
         });
-        
+
         // Escape key to close modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {

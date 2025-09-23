@@ -316,4 +316,20 @@ function dbExecute($sql, $params = []) {
         return false;
     }
 }
+
+/**
+ * Helper function to get single value with error handling
+ */
+function dbGetValue($sql, $params = []) {
+    try {
+        $row = getDB()->getRow($sql, $params);
+        if ($row && is_array($row)) {
+            return reset($row); // Return first value from the row
+        }
+        return null;
+    } catch (Exception $e) {
+        error_log("Database getValue failed: " . $e->getMessage());
+        return null;
+    }
+}
 ?>

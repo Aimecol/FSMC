@@ -349,13 +349,13 @@ include 'includes/header.php';
                         </li>
                     <?php endif; ?>
                     
-                    <?php foreach ($pages as $i): ?>
+                    <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
                         <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
                             <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&action_filter=<?php echo urlencode($action_filter); ?>&table_filter=<?php echo urlencode($table_filter); ?>&user_filter=<?php echo urlencode($user_filter); ?>&date_from=<?php echo urlencode($date_from); ?>&date_to=<?php echo urlencode($date_to); ?>">
                                 <?php echo $i; ?>
                             </a>
                         </li>
-                    <?php endforeach; ?>
+                    <?php endfor; ?>
                     
                     <?php if ($page < $totalPages): ?>
                         <li class="page-item">

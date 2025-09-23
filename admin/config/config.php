@@ -319,11 +319,56 @@ function getSetting($key, $default = null) {
  * Update company setting
  */
 function updateSetting($key, $value) {
-    $sql = "INSERT INTO company_settings (setting_key, setting_value, updated_at) 
-            VALUES (?, ?, NOW()) 
+    $sql = "INSERT INTO company_settings (setting_key, setting_value, updated_at)
+            VALUES (?, ?, NOW())
             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()";
-    
+
     return dbExecute($sql, [$key, $value]);
+}
+
+/**
+ * Validate uploaded file
+ */
+function validateUploadedFile($filename, $fileSize, $tmpName) {
+    $result = ['valid' => false, 'error' => ''];
+
+    // Check file size
+    if ($fileSize > MAX_FILE_SIZE) {
+        $result['error'] = 'File size exceeds maximum allowed size of ' . formatFileSize(MAX_FILE_SIZE);
+        return $result;
+    }
+
+    // Check file extension
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $allowedTypes = array_merge(ALLOWED_IMAGE_TYPES, ALLOWED_DOCUMENT_TYPES);
+
+    if (!in_array($extension, $allowedTypes)) {
+        $result['error'] = 'File type not allowed. Allowed types: ' . implode(', ', $allowedTypes);
+        return $result;
+    }
+
+    // Check if file is actually uploaded
+    if (!is_uploaded_file($tmpName)) {
+        $result['error'] = 'Invalid file upload';
+        return $result;
+    }
+
+    // Additional validation for images
+    if (in_array($extension, ALLOWED_IMAGE_TYPES)) {
+        $imageInfo = getimagesize($tmpName);
+        if ($imageInfo === false) {
+            $result['error'] = 'Invalid image file';
+            return $result;
+        }
+
+        if ($fileSize > MAX_IMAGE_SIZE) {
+            $result['error'] = 'Image size exceeds maximum allowed size of ' . formatFileSize(MAX_IMAGE_SIZE);
+            return $result;
+        }
+    }
+
+    $result['valid'] = true;
+    return $result;
 }
 
 // Initialize error handling

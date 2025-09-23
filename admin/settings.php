@@ -137,10 +137,10 @@ foreach ($settingsResult as $setting) {
 }
 
 // Helper function to get setting value
-function getSetting($key, $default = '') {
-    global $settings;
-    return $settings[$key] ?? $default;
-}
+// function getSetting($key, $default = '') {
+//     global $settings;
+//     return $settings[$key] ?? $default;
+// }
 
 include 'includes/header.php';
 ?>
@@ -152,6 +152,32 @@ include 'includes/header.php';
             <div class="card-header">
                 <h3 class="card-title">Settings</h3>
             </div>
+            <style>
+                .list-group-item {
+                    padding: 0.75rem 1.5rem;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05rem;
+                    text-decoration: none;
+                }
+                .list-group-item i {
+                    font-size: 1rem;
+                }
+                .list-group-item {
+                    gap: 10px;
+                    align-items: center;
+                    display: flex;
+                    border-radius: 0;
+                    color: var(--text-dark);
+                    background-color: transparent;
+                    border-color: transparent;
+                }
+                .list-group-item.active {
+                    background-color: var(--primary-color);
+                    color: var(--white);
+                }
+            </style>
             <div class="list-group list-group-flush">
                 <a href="#company" class="list-group-item list-group-item-action active" data-tab="company">
                     <i class="fas fa-building"></i> Company Information
@@ -172,6 +198,22 @@ include 'includes/header.php';
     <!-- Settings Content -->
     <div class="col-9">
         <!-- Company Information -->
+         <style>
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            /* animations */
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateX(-20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            .tab-content.active {
+                animation: fadeIn 0.5s ease;
+            }
+        </style>
         <div class="tab-content active" id="company">
             <div class="card">
                 <div class="card-header">

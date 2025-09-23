@@ -141,10 +141,10 @@ CREATE TABLE research_projects (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Contact inquiries table
-CREATE TABLE contact_inquiries (
+-- General inquiries table (main table for all inquiries)
+CREATE TABLE inquiries (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    type ENUM('general', 'service', 'product', 'training', 'research') DEFAULT 'general',
+    type ENUM('general', 'service', 'product', 'training', 'research', 'support') DEFAULT 'general',
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
@@ -157,6 +157,26 @@ CREATE TABLE contact_inquiries (
     priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
     assigned_to INT NULL,
     notes TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (assigned_to) REFERENCES admin_users(id) ON DELETE SET NULL
+);
+
+-- Contact inquiries table (legacy/specific contact forms)
+CREATE TABLE contact_inquiries (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('general', 'service', 'product', 'training', 'research') DEFAULT 'general',
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    status ENUM('new', 'read', 'responded', 'closed') DEFAULT 'new',
+    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
+    assigned_to INT,
+    response TEXT,
     ip_address VARCHAR(45),
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -205,7 +225,20 @@ CREATE TABLE product_inquiries (
     FOREIGN KEY (assigned_to) REFERENCES admin_users(id) ON DELETE SET NULL
 );
 
--- Company settings table
+-- General settings table (main settings table)
+CREATE TABLE settings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT,
+    setting_type ENUM('text', 'textarea', 'number', 'boolean', 'json', 'file') DEFAULT 'text',
+    category VARCHAR(50) DEFAULT 'general',
+    description TEXT,
+    is_public BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Company settings table (legacy/specific company settings)
 CREATE TABLE company_settings (
     id INT PRIMARY KEY AUTO_INCREMENT,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
