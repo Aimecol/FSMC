@@ -1,9 +1,54 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+// Include database configuration
+require_once 'config/database.php';
+
+// Get company settings
+$settings = getCompanySettings();
+$companyName = getSetting('company_name', 'Fair Surveying & Mapping Ltd');
+
+// Get all training programs
+$trainingPrograms = dbGetRows("SELECT * FROM training_programs WHERE status = 'active' ORDER BY sort_order ASC, created_at DESC");
+
+// Group programs by category for filtering
+$programsByCategory = [];
+foreach ($trainingPrograms as $program) {
+    if (!empty($program['category'])) {
+        $programsByCategory[$program['category']][] = $program;
+    }
+}
+
+// Get training statistics
+$totalPrograms = count($trainingPrograms);
+$beginnerPrograms = count(array_filter($trainingPrograms, function($p) { return $p['level'] === 'beginner'; }));
+$intermediatePrograms = count(array_filter($trainingPrograms, function($p) { return $p['level'] === 'intermediate'; }));
+$advancedPrograms = count(array_filter($trainingPrograms, function($p) { return $p['level'] === 'advanced'; }));
+
+// Categories mapping
+$categoryMap = [
+    'surveying' => ['label' => 'Surveying Equipment', 'icon' => 'fas fa-compass'],
+    'software' => ['label' => 'Software & Data', 'icon' => 'fas fa-laptop-code'],
+    'gis' => ['label' => 'GIS & Remote Sensing', 'icon' => 'fas fa-satellite'],
+    'advanced' => ['label' => 'Advanced Technologies', 'icon' => 'fas fa-rocket'],
+    'mapping' => ['label' => 'Mapping & Cartography', 'icon' => 'fas fa-map'],
+    'photogrammetry' => ['label' => 'Photogrammetry', 'icon' => 'fas fa-camera'],
+    'drone' => ['label' => 'Drone Technology', 'icon' => 'fas fa-helicopter'],
+    'cad' => ['label' => 'CAD & Design', 'icon' => 'fas fa-drafting-compass']
+];
+
+// Level colors
+$levelColors = [
+    'beginner' => 'beginner',
+    'intermediate' => 'intermediate', 
+    'advanced' => 'advanced'
+];
+?>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Professional Training Programs - Fair Surveying & Mapping Ltd</title>
+    <title><?php echo htmlspecialchars(getSetting('meta_title', 'Professional Training Programs - ' . $companyName)); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars(getSetting('meta_description', 'Enhance your skills with industry-leading training in surveying, mapping, and geospatial technologies.')); ?>" />
     <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
     <link
       rel="stylesheet"
@@ -95,536 +140,118 @@
         <div class="container">
           <h2 class="section-title" data-aos="fade-up">Training Categories</h2>
           <div class="categories-tabs" data-aos="fade-up">
-            <button class="tab-btn active" data-category="surveying">
-              Surveying Equipment
+            <button class="tab-btn active" data-category="all">
+              All Programs
             </button>
-            <button class="tab-btn" data-category="software">
-              Software & Data
+            <?php 
+            $availableCategories = array_unique(array_column($trainingPrograms, 'category'));
+            foreach ($availableCategories as $category): 
+                if (!empty($category) && isset($categoryMap[$category])): ?>
+            <button class="tab-btn" data-category="<?php echo htmlspecialchars($category); ?>">
+              <?php echo htmlspecialchars($categoryMap[$category]['label']); ?>
             </button>
-            <button class="tab-btn" data-category="gis">
-              GIS & Remote Sensing
-            </button>
-            <button class="tab-btn" data-category="advanced">
-              Advanced Technologies
-            </button>
+            <?php endif; endforeach; ?>
           </div>
 
-          <!-- Surveying Equipment Courses -->
-          <div class="courses-grid active" id="surveying-courses">
-            <div class="course-card" data-aos="fade-up">
+          <!-- Dynamic Training Programs -->
+          <div class="courses-grid active" id="all-courses">
+            <?php foreach ($trainingPrograms as $index => $program): 
+              $imageUrl = !empty($program['image']) ? getFileUrl($program['image']) : '../images/placeholder.jpg';
+              $category = $program['category'] ?? 'general';
+              $features = !empty($program['features']) ? json_decode($program['features'], true) : [];
+              $curriculum = !empty($program['curriculum']) ? json_decode($program['curriculum'], true) : [];
+              $level = $program['level'] ?? 'beginner';
+              $levelClass = $levelColors[$level] ?? 'beginner';
+              $priceFormatted = !empty($program['price']) ? number_format($program['price'], 0, '.', ',') . ' RWF' : 'Contact for price';
+            ?>
+            <div class="course-card" data-category="<?php echo htmlspecialchars($category); ?>" data-aos="fade-up" data-aos-delay="<?php echo ($index % 6) * 100; ?>">
               <div class="course-image">
                 <img
-                  src="../images/9ymlPUvjUSWPlrk-qrJ2k.jpg"
-                  alt="Total Station Training"
+                  src="<?php echo htmlspecialchars($imageUrl); ?>"
+                  alt="<?php echo htmlspecialchars($program['title']); ?>"
                 />
-                <div class="course-level intermediate">Intermediate</div>
+                <div class="course-level <?php echo $levelClass; ?>"><?php echo htmlspecialchars(ucfirst($level)); ?></div>
               </div>
               <div class="course-content">
-                <h3>Total Station Masterclass</h3>
+                <h3><?php echo htmlspecialchars($program['title']); ?></h3>
                 <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 3 Days</span>
-                  <span><i class="fas fa-users"></i> Max 12 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
+                  <span><i class="far fa-clock"></i> <?php echo htmlspecialchars($program['duration'] ?? 'TBD'); ?></span>
+                  <span><i class="fas fa-users"></i> Max <?php echo htmlspecialchars($program['max_students'] ?? '15'); ?> Students</span>
+                  <span><i class="fas fa-globe"></i> <?php echo htmlspecialchars($program['language'] ?? 'English'); ?></span>
                 </div>
                 <p>
-                  Master the operation and advanced features of modern total
-                  stations for precision surveying.
+                  <?php echo htmlspecialchars($program['short_description'] ?? substr($program['description'], 0, 120) . '...'); ?>
                 </p>
+                <?php if (!empty($features) && is_array($features)): ?>
                 <ul class="course-features">
+                  <?php foreach (array_slice($features, 0, 3) as $feature): ?>
                   <li>
-                    <i class="fas fa-check-circle"></i> Setup and calibration
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars(is_array($feature) ? ($feature['title'] ?? $feature['name'] ?? '') : $feature); ?>
                   </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Data collection and
-                    transfer
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Troubleshooting in the
-                    field
-                  </li>
+                  <?php endforeach; ?>
                 </ul>
+                <?php endif; ?>
                 <div class="course-footer">
-                  <span class="course-price">75,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
+                  <span class="course-price"><?php echo htmlspecialchars($priceFormatted); ?></span>
+                  <a href="./enrollment.php?program=<?php echo $program['id']; ?>" class="btn-enroll">Enroll Now</a>
                 </div>
               </div>
             </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-              <div class="course-image">
-                <img
-                  src="../images/bhHQ2-XvUG3QKct5kwamE.jpg"
-                  alt="GPS Systems Training"
-                />
-                <div class="course-level beginner">Beginner</div>
-              </div>
-              <div class="course-content">
-                <h3>GPS Systems Fundamentals</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 2 Days</span>
-                  <span><i class="fas fa-users"></i> Max 10 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn the fundamentals of GPS/GNSS technology and handheld
-                  receivers for field measurements.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> GPS principles and
-                    limitations
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Field collection
-                    techniques
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Data processing
-                    workflows
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">50,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-              <div class="course-image">
-                <img
-                  src="../images/rC9AvGLJMT6thyTyTxB--.jpg"
-                  alt="RTK GPS Advanced Training"
-                />
-                <div class="course-level advanced">Advanced</div>
-              </div>
-              <div class="course-content">
-                <h3>RTK GPS Advanced Techniques</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 4 Days</span>
-                  <span><i class="fas fa-users"></i> Max 8 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Advanced training on RTK GPS systems for centimeter-level
-                  accuracy in real-time surveying.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Base & rover setup
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Network RTK solutions
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Quality control
-                    procedures
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">120,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Software & Data Courses -->
-          <div class="courses-grid" id="software-courses">
-            <div class="course-card" data-aos="fade-up">
-              <div class="course-image">
-                <img
-                  src="../images/autocad-training.jpg"
-                  alt="AutoCAD for Surveyors"
-                />
-                <div class="course-level beginner">Beginner</div>
-              </div>
-              <div class="course-content">
-                <h3>AutoCAD for Surveyors</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 5 Days</span>
-                  <span><i class="fas fa-users"></i> Max 15 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn essential AutoCAD skills for creating professional
-                  survey drawings and maps.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Drawing setup and
-                    organization
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Survey data import
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Plan production
-                    workflows
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">90,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-              <div class="course-image">
-                <img
-                  src="../images/python-training.jpg"
-                  alt="Python for Geospatial Analysis"
-                />
-                <div class="course-level intermediate">Intermediate</div>
-              </div>
-              <div class="course-content">
-                <h3>Python for Geospatial Analysis</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 5 Days</span>
-                  <span><i class="fas fa-users"></i> Max 12 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Build Python programming skills for automating and analyzing
-                  geospatial data.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Python fundamentals
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> GeoPandas & GDAL
-                    libraries
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Automating GIS workflows
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">100,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-              <div class="course-image">
-                <img
-                  src="../images/data-analysis.jpg"
-                  alt="Spatial Data Analysis"
-                />
-                <div class="course-level intermediate">Intermediate</div>
-              </div>
-              <div class="course-content">
-                <h3>Spatial Data Analysis & Visualization</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 4 Days</span>
-                  <span><i class="fas fa-users"></i> Max 10 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn techniques for analyzing and visualizing spatial data to
-                  derive meaningful insights.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Statistical analysis
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Advanced visualization
-                  </li>
-                  <li><i class="fas fa-check-circle"></i> Report generation</li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">85,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- GIS & Remote Sensing Courses -->
-          <div class="courses-grid" id="gis-courses">
-            <div class="course-card" data-aos="fade-up">
-              <div class="course-image">
-                <img
-                  src="../images/arcgis-training.jpg"
-                  alt="ArcGIS Fundamentals"
-                />
-                <div class="course-level beginner">Beginner</div>
-              </div>
-              <div class="course-content">
-                <h3>ArcGIS Fundamentals</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 5 Days</span>
-                  <span><i class="fas fa-users"></i> Max 15 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Comprehensive introduction to ArcGIS for mapping, spatial
-                  analysis, and data management.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Data handling &
-                    management
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Map creation & layout
-                    design
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Basic spatial analysis
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">95,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-              <div class="course-image">
-                <img
-                  src="../images/remote-sensing.jpg"
-                  alt="Remote Sensing Fundamentals"
-                />
-                <div class="course-level intermediate">Intermediate</div>
-              </div>
-              <div class="course-content">
-                <h3>Remote Sensing Fundamentals</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 4 Days</span>
-                  <span><i class="fas fa-users"></i> Max 12 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn the principles of remote sensing and satellite imagery
-                  for environmental monitoring.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Image acquisition &
-                    processing
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Land cover
-                    classification
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Change detection
-                    analysis
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">110,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-              <div class="course-image">
-                <img src="../images/qgis-training.jpg" alt="QGIS Advanced" />
-                <div class="course-level advanced">Advanced</div>
-              </div>
-              <div class="course-content">
-                <h3>QGIS Advanced Techniques</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 4 Days</span>
-                  <span><i class="fas fa-users"></i> Max 10 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Master advanced QGIS capabilities for complex GIS projects and
-                  open-source integration.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Custom plugins & Python
-                    scripting
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Database integration
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Web mapping solutions
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">95,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Advanced Technologies Courses -->
-          <div class="courses-grid" id="advanced-courses">
-            <div class="course-card" data-aos="fade-up">
-              <div class="course-image">
-                <img src="../images/drone-mapping.jpg" alt="Drone Mapping" />
-                <div class="course-level intermediate">Intermediate</div>
-              </div>
-              <div class="course-content">
-                <h3>Drone Mapping & Photogrammetry</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 5 Days</span>
-                  <span><i class="fas fa-users"></i> Max 8 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn to plan, execute, and process drone surveys for mapping
-                  and 3D modeling.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Flight planning &
-                    regulations
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Data capture techniques
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Photogrammetry
-                    processing
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">150,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-              <div class="course-image">
-                <img
-                  src="../images/ai-geospatial.jpg"
-                  alt="AI for Geospatial"
-                />
-                <div class="course-level advanced">Advanced</div>
-              </div>
-              <div class="course-content">
-                <h3>AI for Geospatial Analysis</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 5 Days</span>
-                  <span><i class="fas fa-users"></i> Max 10 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Master machine learning and deep learning applications for
-                  geographic data analysis.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> ML fundamentals for
-                    spatial data
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> CNN for image
-                    classification
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Predictive modeling
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">175,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-              <div class="course-image">
-                <img
-                  src="../images/lidar-processing.jpg"
-                  alt="LiDAR Processing"
-                />
-                <div class="course-level advanced">Advanced</div>
-              </div>
-              <div class="course-content">
-                <h3>LiDAR Data Processing & Analysis</h3>
-                <div class="course-meta">
-                  <span><i class="far fa-clock"></i> 4 Days</span>
-                  <span><i class="fas fa-users"></i> Max 8 Students</span>
-                  <span><i class="fas fa-globe"></i> English</span>
-                </div>
-                <p>
-                  Learn to process and analyze LiDAR point cloud data for 3D
-                  modeling and terrain analysis.
-                </p>
-                <ul class="course-features">
-                  <li>
-                    <i class="fas fa-check-circle"></i> Point cloud
-                    classification
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> DTM/DSM generation
-                  </li>
-                  <li>
-                    <i class="fas fa-check-circle"></i> Feature extraction
-                  </li>
-                </ul>
-                <div class="course-footer">
-                  <span class="course-price">160,000 RWF</span>
-                  <a href="#" class="btn-enroll">Enroll Now</a>
-                </div>
-              </div>
-            </div>
+            <?php endforeach; ?>
           </div>
         </div>
       </section>
 
       <!-- Featured Course -->
+      <?php 
+      $featuredProgram = null;
+      foreach ($trainingPrograms as $program) {
+          if (($program['featured'] ?? 0) == 1) {
+              $featuredProgram = $program;
+              break;
+          }
+      }
+      if (!$featuredProgram && !empty($trainingPrograms)) {
+          $featuredProgram = $trainingPrograms[0]; // Use first program if no featured
+      }
+      ?>
+      <?php if ($featuredProgram): ?>
       <section class="featured-course">
         <div class="container">
           <div class="featured-content" data-aos="fade-right">
             <div class="featured-label">Featured Course</div>
-            <h2>Comprehensive Surveying Professional Certificate</h2>
+            <h2><?php echo htmlspecialchars($featuredProgram['title']); ?></h2>
             <p>
-              Our flagship 3-week program combines essential surveying skills,
-              CAD drafting, and GIS analysis into one comprehensive
-              certification course.
+              <?php echo htmlspecialchars($featuredProgram['description']); ?>
             </p>
+            <?php 
+            $featuredFeatures = !empty($featuredProgram['features']) ? json_decode($featuredProgram['features'], true) : [];
+            if (!empty($featuredFeatures) && is_array($featuredFeatures)): ?>
             <ul class="featured-highlights">
+              <?php foreach (array_slice($featuredFeatures, 0, 5) as $feature): ?>
               <li>
-                <i class="fas fa-check"></i> Total Station & GPS field
-                operations
+                <i class="fas fa-check"></i> <?php echo htmlspecialchars(is_array($feature) ? ($feature['title'] ?? $feature['name'] ?? '') : $feature); ?>
               </li>
-              <li>
-                <i class="fas fa-check"></i> AutoCAD drafting for surveyors
-              </li>
-              <li>
-                <i class="fas fa-check"></i> GIS analysis & map production
-              </li>
-              <li>
-                <i class="fas fa-check"></i> Survey mathematics & data
-                processing
-              </li>
-              <li>
-                <i class="fas fa-check"></i> Professional certification exam
-              </li>
+              <?php endforeach; ?>
             </ul>
+            <?php endif; ?>
             <div class="featured-footer">
               <div class="featured-price">
                 <span class="price-label">Price</span>
-                <span class="price-amount">350,000 RWF</span>
+                <span class="price-amount"><?php echo !empty($featuredProgram['price']) ? number_format($featuredProgram['price'], 0, '.', ',') . ' RWF' : 'Contact for price'; ?></span>
               </div>
-              <a href="./contact.php" class="btn-primary">Learn More</a>
+              <a href="./enrollment.php?program=<?php echo $featuredProgram['id']; ?>" class="btn-primary">Enroll Now</a>
             </div>
           </div>
           <div class="featured-image" data-aos="fade-left">
             <img
-              src="../images/rC9AvGLJMT6thyTyTxB--.jpg"
-              alt="Comprehensive Surveying Professional"
+              src="<?php echo htmlspecialchars(!empty($featuredProgram['image']) ? getFileUrl($featuredProgram['image']) : '../images/placeholder.jpg'); ?>"
+              alt="<?php echo htmlspecialchars($featuredProgram['title']); ?>"
             />
           </div>
         </div>
       </section>
+      <?php endif; ?>
 
       <!-- Testimonials Section -->
       <section class="testimonials">

@@ -1,9 +1,106 @@
+<?php
+// Include database configuration
+require_once './config/database.php';
+
+// Handle contact form submission
+$formMessage = '';
+$formMessageType = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
+    try {
+        // Sanitize and validate form data
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $subject = trim($_POST['subject'] ?? '');
+        $serviceInterest = trim($_POST['service'] ?? '');
+        $message = trim($_POST['message'] ?? '');
+        
+        // Basic validation
+        if (empty($name) || empty($email) || empty($message)) {
+            throw new Exception('Please fill in all required fields.');
+        }
+        
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Please enter a valid email address.');
+        }
+        
+        // Insert into database
+        $stmt = getDB()->query("
+            INSERT INTO contact_messages (name, email, phone, subject, service_interest, message, ip_address, user_agent)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ", [
+            $name,
+            $email,
+            $phone,
+            $subject,
+            $serviceInterest,
+            $message,
+            $_SERVER['REMOTE_ADDR'] ?? '',
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
+        
+        $formMessage = 'Your message has been sent successfully. We\'ll get back to you soon!';
+        $formMessageType = 'success';
+        
+        // Clear form data on success
+        $_POST = [];
+        
+    } catch (Exception $e) {
+        $formMessage = 'Error: ' . $e->getMessage();
+        $formMessageType = 'error';
+    }
+}
+
+// Fetch contact information
+$contactInfo = [];
+$stmt = dbGetRows("SELECT * FROM contact_info WHERE is_active = 1 ORDER BY sort_order ASC");
+foreach ($stmt as $row) {
+    $contactInfo[$row['info_key']] = $row;
+}
+
+// Fetch business hours
+$businessHours = dbGetRows("SELECT * FROM business_hours WHERE is_active = 1 ORDER BY sort_order ASC");
+
+// Get company settings
+$companySettings = getCompanySettings();
+
+// Helper function to format contact value with link
+function formatContactValue($info) {
+    $value = htmlspecialchars($info['value']);
+    
+    switch ($info['link_type']) {
+        case 'tel':
+            return '<a href="tel:' . htmlspecialchars($info['value']) . '">' . $value . '</a>';
+        case 'mailto':
+            return '<a href="mailto:' . htmlspecialchars($info['value']) . '">' . $value . '</a>';
+        case 'url':
+            return '<a href="' . htmlspecialchars($info['value']) . '" target="_blank">' . $value . '</a>';
+        default:
+            return nl2br($value);
+    }
+}
+
+// Helper function to format business hours
+function formatBusinessHours($hours) {
+    if ($hours['is_closed']) {
+        return $hours['custom_text'] ?: 'Closed';
+    }
+    
+    if ($hours['opening_time'] && $hours['closing_time']) {
+        return date('g:i A', strtotime($hours['opening_time'])) . ' - ' . date('g:i A', strtotime($hours['closing_time']));
+    }
+    
+    return $hours['custom_text'] ?: 'Contact for hours';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact Us - Banner Fair Surveying & Mapping Ltd</title>
+    <title>Contact Us - <?php echo htmlspecialchars(getSetting('company_name', 'Fair Surveying & Mapping Ltd')); ?></title>
+    <meta name="description" content="Get in touch with <?php echo htmlspecialchars(getSetting('company_name', 'Fair Surveying & Mapping Ltd')); ?> for professional surveying and mapping services.">
     <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
     <link
       rel="stylesheet"
@@ -25,82 +122,55 @@
         <div class="contact-info-section">
           <h2>Get In Touch</h2>
 
+          <?php foreach ($contactInfo as $info): ?>
           <div class="contact-info-item">
             <div class="contact-icon">
-              <i class="fas fa-map-marker-alt"></i>
+              <i class="<?php echo htmlspecialchars($info['icon'] ?: 'fas fa-info-circle'); ?>"></i>
             </div>
             <div class="contact-text">
-              <h4>Our Location</h4>
-              <p>Kigali, Rwanda</p>
+              <h4><?php echo htmlspecialchars($info['title']); ?></h4>
+              <p><?php echo formatContactValue($info); ?></p>
             </div>
           </div>
-
-          <div class="contact-info-item">
-            <div class="contact-icon">
-              <i class="fas fa-phone-alt"></i>
-            </div>
-            <div class="contact-text">
-              <h4>Phone Number</h4>
-              <p><a href="tel:0788331697">0788331697</a></p>
-            </div>
-          </div>
-
-          <div class="contact-info-item">
-            <div class="contact-icon">
-              <i class="fas fa-envelope"></i>
-            </div>
-            <div class="contact-text">
-              <h4>Email Address</h4>
-              <p>
-                <a href="mailto:fsamcompanyltd@gmail.com"
-                  >fsamcompanyltd@gmail.com</a
-                >
-              </p>
-            </div>
-          </div>
-
-          <div class="contact-info-item">
-            <div class="contact-icon">
-              <i class="fas fa-user-tie"></i>
-            </div>
-            <div class="contact-text">
-              <h4>Professional Details</h4>
-              <p>HATANGIMANA Fulgence<br />Surveyor code: LS00280</p>
-            </div>
-          </div>
+          <?php endforeach; ?>
 
           <div class="social-links">
             <h3>Follow Us</h3>
             <div class="social-icons">
-              <div class="social-icon">
+              <?php if (!empty(getSetting('facebook_url'))): ?>
+              <a href="<?php echo htmlspecialchars(getSetting('facebook_url')); ?>" target="_blank" class="social-icon">
                 <i class="fab fa-facebook-f"></i>
-              </div>
-              <div class="social-icon">
+              </a>
+              <?php endif; ?>
+              
+              <?php if (!empty(getSetting('twitter_url'))): ?>
+              <a href="<?php echo htmlspecialchars(getSetting('twitter_url')); ?>" target="_blank" class="social-icon">
                 <i class="fab fa-twitter"></i>
-              </div>
-              <div class="social-icon">
+              </a>
+              <?php endif; ?>
+              
+              <?php if (!empty(getSetting('linkedin_url'))): ?>
+              <a href="<?php echo htmlspecialchars(getSetting('linkedin_url')); ?>" target="_blank" class="social-icon">
                 <i class="fab fa-linkedin-in"></i>
-              </div>
-              <div class="social-icon">
+              </a>
+              <?php endif; ?>
+              
+              <?php if (!empty(getSetting('instagram_url'))): ?>
+              <a href="<?php echo htmlspecialchars(getSetting('instagram_url')); ?>" target="_blank" class="social-icon">
                 <i class="fab fa-instagram"></i>
-              </div>
+              </a>
+              <?php endif; ?>
             </div>
           </div>
 
           <div class="business-hours">
             <h3>Business Hours</h3>
+            <?php foreach ($businessHours as $hours): ?>
             <div class="hours-item">
-              <span class="day">Monday - Friday:</span>
-              <span class="time">8:00 AM - 5:00 PM</span>
+              <span class="day"><?php echo htmlspecialchars($hours['day_label']); ?>:</span>
+              <span class="time"><?php echo formatBusinessHours($hours); ?></span>
             </div>
-            <div class="hours-item">
-              <span class="day">Saturday:</span>
-              <span class="time">9:00 AM - 1:00 PM</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Sunday:</span>
-              <span class="time">Closed</span>
-            </div>
+            <?php endforeach; ?>
           </div>
         </div>
 
@@ -111,17 +181,24 @@
             and we'll get back to you as soon as possible.
           </p>
 
-          <div class="success-message" id="successMessage">
+          <?php if ($formMessage): ?>
+          <div class="<?php echo $formMessageType === 'success' ? 'success-message' : 'error-message'; ?>" style="display: block;">
+            <i class="fas fa-<?php echo $formMessageType === 'success' ? 'check-circle' : 'exclamation-circle'; ?>"></i> 
+            <?php echo htmlspecialchars($formMessage); ?>
+          </div>
+          <?php endif; ?>
+
+          <div class="success-message" id="successMessage" style="display: none;">
             <i class="fas fa-check-circle"></i> Your message has been sent
             successfully. We'll get back to you soon!
           </div>
 
-          <div class="error-message" id="errorMessage">
+          <div class="error-message" id="errorMessage" style="display: none;">
             <i class="fas fa-exclamation-circle"></i> There was an error sending
             your message. Please try again.
           </div>
 
-          <form id="contactForm">
+          <form id="contactForm" method="POST">
             <div class="form-row">
               <div class="form-group">
                 <label for="name" class="form-label">Your Name</label>
@@ -129,6 +206,8 @@
                   type="text"
                   class="form-control"
                   id="name"
+                  name="name"
+                  value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>"
                   placeholder="Enter your name"
                   required
                 />
@@ -139,6 +218,8 @@
                   type="email"
                   class="form-control"
                   id="email"
+                  name="email"
+                  value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
                   placeholder="Enter your email"
                   required
                 />
@@ -152,6 +233,8 @@
                   type="tel"
                   class="form-control"
                   id="phone"
+                  name="phone"
+                  value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>"
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -161,6 +244,8 @@
                   type="text"
                   class="form-control"
                   id="subject"
+                  name="subject"
+                  value="<?php echo htmlspecialchars($_POST['subject'] ?? ''); ?>"
                   placeholder="Enter subject"
                 />
               </div>
@@ -170,23 +255,19 @@
               <label for="service" class="form-label"
                 >Service Interested In</label
               >
-              <select class="form-control" id="service">
+              <select class="form-control" id="service" name="service">
                 <option value="" selected disabled>Select a service</option>
-                <option value="Land Surveying">Land Surveying</option>
-                <option value="First Registration">First Registration</option>
-                <option value="Merging Land Parcels">
-                  Merging Land Parcels
+                <?php 
+                // Fetch active services for dropdown
+                $services = dbGetRows("SELECT title FROM services WHERE status = 'active' ORDER BY sort_order ASC, title ASC");
+                foreach ($services as $service): 
+                    $selected = (isset($_POST['service']) && $_POST['service'] === $service['title']) ? 'selected' : '';
+                ?>
+                <option value="<?php echo htmlspecialchars($service['title']); ?>" <?php echo $selected; ?>>
+                  <?php echo htmlspecialchars($service['title']); ?>
                 </option>
-                <option value="Land Subdivision">Land Subdivision</option>
-                <option value="Boundary Correction">Boundary Correction</option>
-                <option value="Building Permits">Building Permits</option>
-                <option value="Road Consultancy">Road Consultancy</option>
-                <option value="House Plans">House Plans</option>
-                <option value="Environmental Impact Assessment">
-                  Environmental Impact Assessment
-                </option>
-                <option value="Technical Training">Technical Training</option>
-                <option value="Other">Other</option>
+                <?php endforeach; ?>
+                <option value="Other" <?php echo (isset($_POST['service']) && $_POST['service'] === 'Other') ? 'selected' : ''; ?>>Other</option>
               </select>
             </div>
 
@@ -195,13 +276,14 @@
               <textarea
                 class="form-control"
                 id="message"
+                name="message"
                 rows="5"
                 placeholder="Type your message here..."
                 required
-              ></textarea>
+              ><?php echo htmlspecialchars($_POST['message'] ?? ''); ?></textarea>
             </div>
 
-            <button type="submit" class="btn-submit">
+            <button type="submit" name="submit_contact" class="btn-submit">
               <i class="fas fa-paper-plane"></i> Send Message
             </button>
           </form>
@@ -220,81 +302,6 @@
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
-          </div>
-        </div>
-      </div>
-
-      <div class="services-section">
-        <div class="services-title">
-          <h2>Our Services</h2>
-          <div class="title-underline"></div>
-        </div>
-
-        <div class="services-grid">
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-map"></i>
-            </div>
-            <h3 class="service-title">Land Surveying & Mapping</h3>
-            <p class="service-desc">
-              Professional land surveying services including first registration,
-              merging land parcels, land subdivision, and boundary correction.
-            </p>
-          </div>
-
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-building"></i>
-            </div>
-            <h3 class="service-title">Building & Construction</h3>
-            <p class="service-desc">
-              We assist with building permits, road consultancy, and house plans
-              design to support your construction projects.
-            </p>
-          </div>
-
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-leaf"></i>
-            </div>
-            <h3 class="service-title">Environmental Consultancy</h3>
-            <p class="service-desc">
-              Environmental Impact Assessment (EIA) services to ensure your
-              projects meet environmental standards and regulations.
-            </p>
-          </div>
-
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-laptop-code"></i>
-            </div>
-            <h3 class="service-title">Technical Training</h3>
-            <p class="service-desc">
-              Training on surveying equipment & software, Python for data
-              analysis, GIS & Remote Sensing, and Artificial Intelligence.
-            </p>
-          </div>
-
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-tools"></i>
-            </div>
-            <h3 class="service-title">Equipment & Software</h3>
-            <p class="service-desc">
-              Access to professional surveying equipment including Total
-              Station, as well as software solutions like AutoCAD & ArcGIS.
-            </p>
-          </div>
-
-          <div class="service-card">
-            <div class="service-icon">
-              <i class="fas fa-search"></i>
-            </div>
-            <h3 class="service-title">Research Support</h3>
-            <p class="service-desc">
-              Comprehensive research support services for geospatial analysis,
-              environmental studies, and data-driven projects.
-            </p>
           </div>
         </div>
       </div>

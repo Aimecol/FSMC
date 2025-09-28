@@ -160,8 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Prepare form data
-$formData = $research ?: [
+// Prepare form data with default values
+$defaultData = [
     'title' => '',
     'slug' => '',
     'abstract' => '',
@@ -182,6 +182,14 @@ $formData = $research ?: [
     'meta_title' => '',
     'meta_description' => ''
 ];
+
+// Merge research data with defaults, ensuring no NULL values
+$formData = $defaultData;
+if ($research) {
+    foreach ($research as $key => $value) {
+        $formData[$key] = $value ?? $defaultData[$key] ?? '';
+    }
+}
 
 // Decode JSON fields
 $keywords = json_decode($formData['keywords'] ?? '[]', true) ?: [];
@@ -220,14 +228,14 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="title" class="form-label">Title *</label>
                         <input type="text" id="title" name="title" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['title']); ?>" 
+                               value="<?php echo htmlspecialchars($formData['title'] ?? ''); ?>" 
                                required maxlength="300">
                     </div>
                     
                     <div class="form-group">
                         <label for="slug" class="form-label">Slug</label>
                         <input type="text" id="slug" name="slug" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['slug']); ?>" 
+                               value="<?php echo htmlspecialchars($formData['slug'] ?? ''); ?>" 
                                maxlength="300">
                         <div class="form-text">URL-friendly version of the title. Leave empty to auto-generate.</div>
                     </div>
@@ -250,7 +258,7 @@ include 'includes/header.php';
                             <div class="form-group">
                                 <label for="authors" class="form-label">Authors</label>
                                 <input type="text" id="authors" name="authors" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['authors']); ?>" 
+                                       value="<?php echo htmlspecialchars($formData['authors'] ?? ''); ?>" 
                                        placeholder="e.g., John Doe, Jane Smith, et al.">
                             </div>
                         </div>
@@ -259,21 +267,21 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="abstract" class="form-label">Abstract *</label>
                         <textarea id="abstract" name="abstract" class="form-control" 
-                                  rows="6" required><?php echo htmlspecialchars($formData['abstract']); ?></textarea>
+                                  rows="6" required><?php echo htmlspecialchars($formData['abstract'] ?? ''); ?></textarea>
                         <div class="form-text">Brief summary of the research project.</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="methodology" class="form-label">Methodology</label>
                         <textarea id="methodology" name="methodology" class="form-control" 
-                                  rows="6"><?php echo htmlspecialchars($formData['methodology']); ?></textarea>
+                                  rows="6"><?php echo htmlspecialchars($formData['methodology'] ?? ''); ?></textarea>
                         <div class="form-text">Research methods and approaches used.</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="key_findings" class="form-label">Key Findings</label>
                         <textarea id="key_findings" name="key_findings" class="form-control"
-                                  rows="6"><?php echo htmlspecialchars($formData['key_findings']); ?></textarea>
+                                  rows="6"><?php echo htmlspecialchars($formData['key_findings'] ?? ''); ?></textarea>
                         <div class="form-text">Main results and conclusions.</div>
                     </div>
                 </div>
@@ -290,14 +298,14 @@ include 'includes/header.php';
                             <div class="form-group">
                                 <label for="publication_date" class="form-label">Publication Date</label>
                                 <input type="date" id="publication_date" name="publication_date" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['publication_date']); ?>">
+                                       value="<?php echo htmlspecialchars($formData['publication_date'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="journal" class="form-label">Journal/Conference</label>
                                 <input type="text" id="journal" name="journal" class="form-control" 
-                                       value="<?php echo htmlspecialchars($formData['journal']); ?>" 
+                                       value="<?php echo htmlspecialchars($formData['journal'] ?? ''); ?>" 
                                        placeholder="e.g., Journal of Surveying Engineering">
                             </div>
                         </div>
@@ -306,7 +314,7 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="description" class="form-label required">Description</label>
                         <textarea id="description" name="description" class="form-control"
-                                  rows="4" required><?php echo htmlspecialchars($formData['description']); ?></textarea>
+                                  rows="4" required><?php echo htmlspecialchars($formData['description'] ?? ''); ?></textarea>
                         <div class="form-text">Detailed description of the research project.</div>
                     </div>
 
@@ -340,7 +348,7 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="doi" class="form-label">DOI</label>
                         <input type="text" id="doi" name="doi" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['doi']); ?>" 
+                               value="<?php echo htmlspecialchars($formData['doi'] ?? ''); ?>" 
                                placeholder="e.g., 10.1061/(ASCE)SU.1943-5428.0000123">
                         <div class="form-text">Digital Object Identifier</div>
                     </div>
@@ -411,7 +419,7 @@ include 'includes/header.php';
                                      style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px;">
                                 <div class="mt-2">
                                     <small class="text-muted">Current image</small>
-                                    <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($formData['image']); ?>">
+                                    <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($formData['image'] ?? ''); ?>">
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -453,14 +461,14 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="meta_title" class="form-label">Meta Title</label>
                         <input type="text" id="meta_title" name="meta_title" class="form-control" 
-                               value="<?php echo htmlspecialchars($formData['meta_title']); ?>" 
+                               value="<?php echo htmlspecialchars($formData['meta_title'] ?? ''); ?>" 
                                maxlength="200">
                     </div>
                     
                     <div class="form-group">
                         <label for="meta_description" class="form-label">Meta Description</label>
                         <textarea id="meta_description" name="meta_description" class="form-control" 
-                                  rows="3" maxlength="300"><?php echo htmlspecialchars($formData['meta_description']); ?></textarea>
+                                  rows="3" maxlength="300"><?php echo htmlspecialchars($formData['meta_description'] ?? ''); ?></textarea>
                     </div>
                 </div>
             </div>

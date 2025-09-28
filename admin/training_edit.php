@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'level' => sanitize($_POST['level'] ?? 'beginner'),
             'features' => json_encode(processArrayField($_POST, 'features')),
             'curriculum' => json_encode(processArrayField($_POST, 'curriculum')),
-            'requirements' => sanitize($_POST['requirements'] ?? ''),
+            'requirements' => json_encode(processArrayField($_POST, 'requirements')),
             'image' => $imageUploadResult && $imageUploadResult['success'] ? $imageUploadResult['file_path'] : (sanitize($_POST['current_image'] ?? '') ?: ''),
             'gallery' => json_encode(processArrayField($_POST, 'gallery')),
             'instructor' => sanitize($_POST['instructor'] ?? ''),
@@ -181,7 +181,7 @@ $formData = $training ?: [
     'level' => 'beginner',
     'features' => '[]',
     'curriculum' => '[]',
-    'requirements' => '',
+    'requirements' => '[]',
     'image' => '',
     'gallery' => '[]',
     'instructor' => '',
@@ -193,7 +193,9 @@ $formData = $training ?: [
 
 // Decode JSON fields
 $curriculum = json_decode($formData['curriculum'] ?? '[]', true) ?: [];
+$features = json_decode($formData['features'] ?? '[]', true) ?: [];
 $requirements = json_decode($formData['requirements'] ?? '[]', true) ?: [];
+$gallery = json_decode($formData['gallery'] ?? '[]', true) ?: [];
 
 // Levels
 $levels = [

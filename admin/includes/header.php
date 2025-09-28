@@ -38,53 +38,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             </div>
         </div>
         
-        <div class="nav-right">
-            <!-- Notifications -->
-            <div class="nav-item dropdown" id="notificationsDropdown">
-                <button class="nav-btn" data-toggle="dropdown">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge" id="notificationCount">3</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-header">
-                        <h6>Notifications</h6>
-                        <a href="#" class="mark-all-read">Mark all as read</a>
-                    </div>
-                    <div class="dropdown-body">
-                        <a href="#" class="dropdown-item">
-                            <div class="notification-item">
-                                <i class="fas fa-envelope text-primary"></i>
-                                <div class="notification-content">
-                                    <p>New contact inquiry received</p>
-                                    <small>2 minutes ago</small>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <div class="notification-item">
-                                <i class="fas fa-user-plus text-success"></i>
-                                <div class="notification-content">
-                                    <p>New training enrollment</p>
-                                    <small>1 hour ago</small>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <div class="notification-item">
-                                <i class="fas fa-shopping-cart text-warning"></i>
-                                <div class="notification-content">
-                                    <p>Product inquiry from client</p>
-                                    <small>3 hours ago</small>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="dropdown-footer">
-                        <a href="notifications.php">View all notifications</a>
-                    </div>
-                </div>
-            </div>
-            
+        <div class="nav-right">            
             <!-- User Menu -->
             <div class="nav-item dropdown" id="userDropdown">
                 <button class="nav-btn user-btn" data-toggle="dropdown">
@@ -156,6 +110,20 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                         <a href="research.php" class="nav-link <?php echo $currentPage === 'research' ? 'active' : ''; ?>">
                             <i class="fas fa-microscope"></i>
                             <span>Research</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="about_manage.php" class="nav-link <?php echo $currentPage === 'about_manage' ? 'active' : ''; ?>">
+                            <i class="fas fa-info-circle"></i>
+                            <span>About</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="contact_manage.php" class="nav-link <?php echo $currentPage === 'contact_manage' ? 'active' : ''; ?>">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Contact</span>
                         </a>
                     </li>
                     

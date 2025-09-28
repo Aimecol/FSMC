@@ -24,6 +24,95 @@ function processArrayField($postData, $fieldName) {
     return [];
 }
 
+// Helper function to process enhanced features
+function processEnhancedFeatures($postData) {
+    $features = [];
+    if (isset($postData['feature_title']) && is_array($postData['feature_title'])) {
+        foreach ($postData['feature_title'] as $index => $title) {
+            if (!empty(trim($title))) {
+                $features[] = [
+                    'title' => sanitize($title),
+                    'description' => sanitize($postData['feature_description'][$index] ?? ''),
+                    'icon' => sanitize($postData['feature_icon'][$index] ?? 'fas fa-check-circle')
+                ];
+            }
+        }
+    }
+    return $features;
+}
+
+// Helper function to process process steps
+function processProcessSteps($postData) {
+    $steps = [];
+    if (isset($postData['process_step_title']) && is_array($postData['process_step_title'])) {
+        foreach ($postData['process_step_title'] as $index => $title) {
+            if (!empty(trim($title))) {
+                $steps[] = [
+                    'step' => $index + 1,
+                    'title' => sanitize($title),
+                    'description' => sanitize($postData['process_step_description'][$index] ?? ''),
+                    'icon' => sanitize($postData['process_step_icon'][$index] ?? 'fas fa-check-circle')
+                ];
+            }
+        }
+    }
+    return $steps;
+}
+
+// Helper function to process benefits
+function processBenefits($postData) {
+    $benefits = [];
+    if (isset($postData['benefit_title']) && is_array($postData['benefit_title'])) {
+        foreach ($postData['benefit_title'] as $index => $title) {
+            if (!empty(trim($title))) {
+                $benefits[] = [
+                    'title' => sanitize($title),
+                    'description' => sanitize($postData['benefit_description'][$index] ?? ''),
+                    'icon' => sanitize($postData['benefit_icon'][$index] ?? 'fas fa-check-circle')
+                ];
+            }
+        }
+    }
+    return $benefits;
+}
+
+// Helper function to process requirements
+function processRequirements($postData) {
+    $requirements = [];
+    if (isset($postData['requirement_category']) && is_array($postData['requirement_category'])) {
+        foreach ($postData['requirement_category'] as $index => $category) {
+            if (!empty(trim($category))) {
+                $items = [];
+                if (isset($postData['requirement_items'][$index])) {
+                    $itemsText = $postData['requirement_items'][$index];
+                    $items = array_filter(array_map('trim', explode("\n", $itemsText)));
+                }
+                $requirements[] = [
+                    'category' => sanitize($category),
+                    'items' => $items
+                ];
+            }
+        }
+    }
+    return $requirements;
+}
+
+// Helper function to process FAQs
+function processFAQs($postData) {
+    $faqs = [];
+    if (isset($postData['faq_question']) && is_array($postData['faq_question'])) {
+        foreach ($postData['faq_question'] as $index => $question) {
+            if (!empty(trim($question))) {
+                $faqs[] = [
+                    'question' => sanitize($question),
+                    'answer' => sanitize($postData['faq_answer'][$index] ?? '')
+                ];
+            }
+        }
+    }
+    return $faqs;
+}
+
 $serviceId = intval($_GET['id'] ?? 0);
 $isEdit = $serviceId > 0;
 
@@ -69,7 +158,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'languages' => json_encode(processArrayField($_POST, 'languages')),
             'price' => !empty($_POST['price']) ? floatval($_POST['price']) : null,
             'duration' => sanitize($_POST['duration'] ?? ''),
-            'features' => json_encode(processArrayField($_POST, 'features')),
+            'features' => json_encode(processEnhancedFeatures($_POST)),
+            'process_steps' => json_encode(processProcessSteps($_POST)),
+            'benefits' => json_encode(processBenefits($_POST)),
+            'requirements' => json_encode(processRequirements($_POST)),
+            'faqs' => json_encode(processFAQs($_POST)),
             'image' => $imageUploadResult && $imageUploadResult['success'] ? $imageUploadResult['file_path'] : (sanitize($_POST['current_image'] ?? '') ?: ''),
             'status' => sanitize($_POST['status'] ?? 'active'),
             'sort_order' => intval($_POST['sort_order'] ?? 0),
@@ -108,7 +201,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $sql = "UPDATE services SET 
                             title = ?, slug = ?, description = ?, short_description = ?, 
                             icon = ?, languages = ?, price = ?, duration = ?, features = ?, 
-                            status = ?, sort_order = ?, meta_title = ?, meta_description = ?, 
+                            process_steps = ?, benefits = ?, requirements = ?, faqs = ?,
+                            image = ?, status = ?, sort_order = ?, meta_title = ?, meta_description = ?, 
                             updated_at = NOW() 
                             WHERE id = ?";
                     
@@ -126,8 +220,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Create new service
                     $sql = "INSERT INTO services 
                             (title, slug, description, short_description, icon, languages, 
-                             price, duration, features, status, sort_order, meta_title, meta_description) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                             price, duration, features, process_steps, benefits, requirements, faqs,
+                             image, status, sort_order, meta_title, meta_description) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     
                     $newId = dbInsert($sql, array_values($data));
                     if ($newId) {
@@ -161,6 +256,10 @@ $formData = $service ?: [
     'price' => '',
     'duration' => '',
     'features' => '[]',
+    'process_steps' => '[]',
+    'benefits' => '[]',
+    'requirements' => '[]',
+    'faqs' => '[]',
     'status' => 'active',
     'sort_order' => 0,
     'meta_title' => '',
@@ -169,7 +268,33 @@ $formData = $service ?: [
 
 // Decode JSON fields
 $languages = json_decode($formData['languages'] ?? '[]', true) ?: [];
-$features = json_decode($formData['features'] ?? '[]', true) ?: [];
+$featuresData = json_decode($formData['features'] ?? '[]', true) ?: [];
+
+// Handle backward compatibility for features
+$features = [];
+if (!empty($featuresData)) {
+    // Check if it's the new format (array of objects) or old format (array of strings)
+    if (isset($featuresData[0]) && is_array($featuresData[0]) && isset($featuresData[0]['title'])) {
+        // New enhanced format
+        $features = $featuresData;
+    } else {
+        // Old simple format - convert to new format
+        foreach ($featuresData as $feature) {
+            if (is_string($feature)) {
+                $features[] = [
+                    'title' => $feature,
+                    'description' => '',
+                    'icon' => 'fas fa-check-circle'
+                ];
+            }
+        }
+    }
+}
+
+$processSteps = json_decode($formData['process_steps'] ?? '[]', true) ?: [];
+$benefits = json_decode($formData['benefits'] ?? '[]', true) ?: [];
+$requirements = json_decode($formData['requirements'] ?? '[]', true) ?: [];
+$faqs = json_decode($formData['faqs'] ?? '[]', true) ?: [];
 
 include 'includes/header.php';
 ?>
@@ -271,33 +396,318 @@ include 'includes/header.php';
             <!-- Features -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Features</h3>
+                    <h3 class="card-title">Service Features</h3>
                 </div>
                 <div class="card-body">
                     <div id="features-container">
                         <?php foreach ($features as $index => $feature): ?>
-                        <div class="form-group d-flex align-items-center feature-item">
-                            <input type="text" name="features[]" class="form-control" 
-                                   value="<?php echo htmlspecialchars($feature); ?>" 
-                                   placeholder="Feature description">
-                            <button type="button" class="btn btn-outline-danger btn-sm ms-2 remove-feature">
-                                <i class="fas fa-times"></i>
+                        <div class="feature-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Feature Title</label>
+                                        <input type="text" name="feature_title[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($feature['title'] ?? ''); ?>" 
+                                               placeholder="e.g., Professional Survey">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="feature_icon[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($feature['icon'] ?? 'fas fa-check-circle'); ?>" 
+                                               placeholder="e.g., fas fa-map-marked-alt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Feature Description</label>
+                                <textarea name="feature_description[]" class="form-control" rows="2" 
+                                          placeholder="Describe this feature and its benefits"><?php echo htmlspecialchars($feature['description'] ?? ''); ?></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-feature">
+                                <i class="fas fa-times"></i> Remove Feature
                             </button>
                         </div>
                         <?php endforeach; ?>
                         
                         <?php if (empty($features)): ?>
-                        <div class="form-group d-flex align-items-center feature-item">
-                            <input type="text" name="features[]" class="form-control" 
-                                   placeholder="Feature description">
-                            <button type="button" class="btn btn-outline-danger btn-sm ms-2 remove-feature">
-                                <i class="fas fa-times"></i>
+                        <div class="feature-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Feature Title</label>
+                                        <input type="text" name="feature_title[]" class="form-control" 
+                                               placeholder="e.g., Professional Survey">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="feature_icon[]" class="form-control" 
+                                               value="fas fa-check-circle" placeholder="e.g., fas fa-map-marked-alt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Feature Description</label>
+                                <textarea name="feature_description[]" class="form-control" rows="2" 
+                                          placeholder="Describe this feature and its benefits"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-feature">
+                                <i class="fas fa-times"></i> Remove Feature
                             </button>
                         </div>
                         <?php endif; ?>
                     </div>
                     <button type="button" id="add-feature" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-plus"></i> Add Feature
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Process Steps -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Process Steps</h3>
+                </div>
+                <div class="card-body">
+                    <div id="process-steps-container">
+                        <?php foreach ($processSteps as $index => $step): ?>
+                        <div class="process-step-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Step Title</label>
+                                        <input type="text" name="process_step_title[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($step['title'] ?? ''); ?>" 
+                                               placeholder="e.g., Initial Consultation">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="process_step_icon[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($step['icon'] ?? 'fas fa-check-circle'); ?>" 
+                                               placeholder="e.g., fas fa-comments">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Step Description</label>
+                                <textarea name="process_step_description[]" class="form-control" rows="2" 
+                                          placeholder="Describe what happens in this step"><?php echo htmlspecialchars($step['description'] ?? ''); ?></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-process-step">
+                                <i class="fas fa-times"></i> Remove Step
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($processSteps)): ?>
+                        <div class="process-step-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Step Title</label>
+                                        <input type="text" name="process_step_title[]" class="form-control" 
+                                               placeholder="e.g., Initial Consultation">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="process_step_icon[]" class="form-control" 
+                                               value="fas fa-check-circle" placeholder="e.g., fas fa-comments">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Step Description</label>
+                                <textarea name="process_step_description[]" class="form-control" rows="2" 
+                                          placeholder="Describe what happens in this step"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-process-step">
+                                <i class="fas fa-times"></i> Remove Step
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="button" id="add-process-step" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Process Step
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Benefits -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Service Benefits</h3>
+                </div>
+                <div class="card-body">
+                    <div id="benefits-container">
+                        <?php foreach ($benefits as $index => $benefit): ?>
+                        <div class="benefit-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Benefit Title</label>
+                                        <input type="text" name="benefit_title[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($benefit['title'] ?? ''); ?>" 
+                                               placeholder="e.g., Legal Protection">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="benefit_icon[]" class="form-control" 
+                                               value="<?php echo htmlspecialchars($benefit['icon'] ?? 'fas fa-check-circle'); ?>" 
+                                               placeholder="e.g., fas fa-shield-alt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Benefit Description</label>
+                                <textarea name="benefit_description[]" class="form-control" rows="2" 
+                                          placeholder="Explain the benefit to customers"><?php echo htmlspecialchars($benefit['description'] ?? ''); ?></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-benefit">
+                                <i class="fas fa-times"></i> Remove Benefit
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($benefits)): ?>
+                        <div class="benefit-item border rounded p-3 mb-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Benefit Title</label>
+                                        <input type="text" name="benefit_title[]" class="form-control" 
+                                               placeholder="e.g., Legal Protection">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Icon Class</label>
+                                        <input type="text" name="benefit_icon[]" class="form-control" 
+                                               value="fas fa-check-circle" placeholder="e.g., fas fa-shield-alt">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Benefit Description</label>
+                                <textarea name="benefit_description[]" class="form-control" rows="2" 
+                                          placeholder="Explain the benefit to customers"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-benefit">
+                                <i class="fas fa-times"></i> Remove Benefit
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="button" id="add-benefit" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Benefit
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Requirements -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Service Requirements</h3>
+                </div>
+                <div class="card-body">
+                    <div id="requirements-container">
+                        <?php foreach ($requirements as $index => $requirement): ?>
+                        <div class="requirement-item border rounded p-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <input type="text" name="requirement_category[]" class="form-control" 
+                                       value="<?php echo htmlspecialchars($requirement['category'] ?? ''); ?>" 
+                                       placeholder="e.g., Required Documents">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Items (one per line)</label>
+                                <textarea name="requirement_items[]" class="form-control" rows="4" 
+                                          placeholder="List each requirement item on a new line"><?php echo htmlspecialchars(implode("\n", $requirement['items'] ?? [])); ?></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-requirement">
+                                <i class="fas fa-times"></i> Remove Category
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($requirements)): ?>
+                        <div class="requirement-item border rounded p-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <input type="text" name="requirement_category[]" class="form-control" 
+                                       placeholder="e.g., Required Documents">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Items (one per line)</label>
+                                <textarea name="requirement_items[]" class="form-control" rows="4" 
+                                          placeholder="List each requirement item on a new line"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-requirement">
+                                <i class="fas fa-times"></i> Remove Category
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="button" id="add-requirement" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Requirement Category
+                    </button>
+                </div>
+            </div>
+            
+            <!-- FAQs -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Frequently Asked Questions</h3>
+                </div>
+                <div class="card-body">
+                    <div id="faqs-container">
+                        <?php foreach ($faqs as $index => $faq): ?>
+                        <div class="faq-item border rounded p-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Question</label>
+                                <input type="text" name="faq_question[]" class="form-control" 
+                                       value="<?php echo htmlspecialchars($faq['question'] ?? ''); ?>" 
+                                       placeholder="Enter the frequently asked question">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Answer</label>
+                                <textarea name="faq_answer[]" class="form-control" rows="3" 
+                                          placeholder="Provide a detailed answer"><?php echo htmlspecialchars($faq['answer'] ?? ''); ?></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-faq">
+                                <i class="fas fa-times"></i> Remove FAQ
+                            </button>
+                        </div>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($faqs)): ?>
+                        <div class="faq-item border rounded p-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Question</label>
+                                <input type="text" name="faq_question[]" class="form-control" 
+                                       placeholder="Enter the frequently asked question">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Answer</label>
+                                <textarea name="faq_answer[]" class="form-control" rows="3" 
+                                          placeholder="Provide a detailed answer"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-faq">
+                                <i class="fas fa-times"></i> Remove FAQ
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="button" id="add-faq" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add FAQ
                     </button>
                 </div>
             </div>
@@ -479,12 +889,31 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('add-feature').addEventListener('click', function() {
         const container = document.getElementById('features-container');
         const newItem = document.createElement('div');
-        newItem.className = 'form-group d-flex align-items-center feature-item';
+        newItem.className = 'feature-item border rounded p-3 mb-3';
         newItem.innerHTML = `
-            <input type="text" name="features[]" class="form-control" 
-                   placeholder="Feature description">
-            <button type="button" class="btn btn-outline-danger btn-sm ms-2 remove-feature">
-                <i class="fas fa-times"></i>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Feature Title</label>
+                        <input type="text" name="feature_title[]" class="form-control" 
+                               placeholder="e.g., Professional Survey">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Icon Class</label>
+                        <input type="text" name="feature_icon[]" class="form-control" 
+                               value="fas fa-check-circle" placeholder="e.g., fas fa-map-marked-alt">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Feature Description</label>
+                <textarea name="feature_description[]" class="form-control" rows="2" 
+                          placeholder="Describe this feature and its benefits"></textarea>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-feature">
+                <i class="fas fa-times"></i> Remove Feature
             </button>
         `;
         container.appendChild(newItem);
@@ -506,6 +935,156 @@ document.addEventListener('DOMContentLoaded', function() {
         const preview = document.querySelector('.card-body i[class*="fa-3x"]');
         if (preview && this.value) {
             preview.className = this.value + ' fa-3x text-primary';
+        }
+    });
+    
+    // Process Steps functionality
+    document.getElementById('add-process-step').addEventListener('click', function() {
+        const container = document.getElementById('process-steps-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'process-step-item border rounded p-3 mb-3';
+        newItem.innerHTML = `
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Step Title</label>
+                        <input type="text" name="process_step_title[]" class="form-control" 
+                               placeholder="e.g., Initial Consultation">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Icon Class</label>
+                        <input type="text" name="process_step_icon[]" class="form-control" 
+                               value="fas fa-check-circle" placeholder="e.g., fas fa-comments">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Step Description</label>
+                <textarea name="process_step_description[]" class="form-control" rows="2" 
+                          placeholder="Describe what happens in this step"></textarea>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-process-step">
+                <i class="fas fa-times"></i> Remove Step
+            </button>
+        `;
+        container.appendChild(newItem);
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-process-step')) {
+            const item = e.target.closest('.process-step-item');
+            if (document.querySelectorAll('.process-step-item').length > 1) {
+                item.remove();
+            }
+        }
+    });
+    
+    // Benefits functionality
+    document.getElementById('add-benefit').addEventListener('click', function() {
+        const container = document.getElementById('benefits-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'benefit-item border rounded p-3 mb-3';
+        newItem.innerHTML = `
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Benefit Title</label>
+                        <input type="text" name="benefit_title[]" class="form-control" 
+                               placeholder="e.g., Legal Protection">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">Icon Class</label>
+                        <input type="text" name="benefit_icon[]" class="form-control" 
+                               value="fas fa-check-circle" placeholder="e.g., fas fa-shield-alt">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Benefit Description</label>
+                <textarea name="benefit_description[]" class="form-control" rows="2" 
+                          placeholder="Explain the benefit to customers"></textarea>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-benefit">
+                <i class="fas fa-times"></i> Remove Benefit
+            </button>
+        `;
+        container.appendChild(newItem);
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-benefit')) {
+            const item = e.target.closest('.benefit-item');
+            if (document.querySelectorAll('.benefit-item').length > 1) {
+                item.remove();
+            }
+        }
+    });
+    
+    // Requirements functionality
+    document.getElementById('add-requirement').addEventListener('click', function() {
+        const container = document.getElementById('requirements-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'requirement-item border rounded p-3 mb-3';
+        newItem.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <input type="text" name="requirement_category[]" class="form-control" 
+                       placeholder="e.g., Required Documents">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Items (one per line)</label>
+                <textarea name="requirement_items[]" class="form-control" rows="4" 
+                          placeholder="List each requirement item on a new line"></textarea>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-requirement">
+                <i class="fas fa-times"></i> Remove Category
+            </button>
+        `;
+        container.appendChild(newItem);
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-requirement')) {
+            const item = e.target.closest('.requirement-item');
+            if (document.querySelectorAll('.requirement-item').length > 1) {
+                item.remove();
+            }
+        }
+    });
+    
+    // FAQs functionality
+    document.getElementById('add-faq').addEventListener('click', function() {
+        const container = document.getElementById('faqs-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'faq-item border rounded p-3 mb-3';
+        newItem.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Question</label>
+                <input type="text" name="faq_question[]" class="form-control" 
+                       placeholder="Enter the frequently asked question">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Answer</label>
+                <textarea name="faq_answer[]" class="form-control" rows="3" 
+                          placeholder="Provide a detailed answer"></textarea>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-faq">
+                <i class="fas fa-times"></i> Remove FAQ
+            </button>
+        `;
+        container.appendChild(newItem);
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-faq')) {
+            const item = e.target.closest('.faq-item');
+            if (document.querySelectorAll('.faq-item').length > 1) {
+                item.remove();
+            }
         }
     });
 });

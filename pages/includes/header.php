@@ -1,16 +1,22 @@
+<?php
+// Include database configuration if not already included
+if (!function_exists('getSetting')) {
+    require_once '../config/database.php';
+}
+?>
 <header class="header">
     <div class="top-bar">
     <div class="top-bar-content">
         <div class="contact-info">
-        <a href="tel:0788331697"><i class="fas fa-phone"></i> 0788331697</a>
-        <a href="mailto:fsamcompanyltd@gmail.com"
-            ><i class="fas fa-envelope"></i> fsamcompanyltd@gmail.com</a
+        <a href="tel:<?php echo str_replace(' ', '', getSetting('company_phone', '0788331697')); ?>"><i class="fas fa-phone"></i> <?php echo getSetting('company_phone', '0788331697'); ?></a>
+        <a href="mailto:<?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?>"
+            ><i class="fas fa-envelope"></i> <?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?></a
         >
         </div>
         <div>
         <span
-            ><i class="fas fa-user-tie"></i> HATANGIMANA Fulgence, Surveyor
-            code: LS00280</span
+            ><i class="fas fa-user-tie"></i> <?php echo getSetting('surveyor_name', 'HATANGIMANA Fulgence'); ?>, Surveyor
+            code: <?php echo getSetting('surveyor_code', 'LS00280'); ?></span
         >
         </div>
     </div>
@@ -276,7 +282,7 @@
             text-anchor="middle"
             >
             <textPath href="#textPath" startOffset="50%">
-                FAIR SURVEYING & MAPPING LTD
+                <?php echo strtoupper(getSetting('company_name', 'FAIR SURVEYING & MAPPING LTD')); ?>
             </textPath>
             </text>
 
@@ -293,7 +299,7 @@
             text-anchor="middle"
             >
             <textPath href="#textPath2" startOffset="50%">
-                Reliable | Professional | Expert Solutions
+                <?php echo getSetting('company_tagline', 'Reliable | Professional | Expert Solutions'); ?>
             </textPath>
             </text>
 
@@ -307,14 +313,14 @@
             fill="#1a5276"
             text-anchor="middle"
             >
-            EST. 2023
+            EST. <?php echo getSetting('establishment_year', '2023'); ?>
             </text>
         </svg>
         </div>
         <div class="logo-text">
-        <div class="logo-name">FAIR SURVEYING & MAPPING LTD</div>
+        <div class="logo-name"><?php echo strtoupper(getSetting('company_name', 'FAIR SURVEYING & MAPPING LTD')); ?></div>
         <div class="logo-tagline">
-            Reliable | Professional | Expert Solutions
+            <?php echo getSetting('company_tagline', 'Reliable | Professional | Expert Solutions'); ?>
         </div>
         </div>
     </div>

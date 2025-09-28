@@ -1,9 +1,103 @@
+<?php
+// Include database configuration
+require_once 'config/database.php';
+
+// Get company settings
+$settings = getCompanySettings();
+$companyName = getSetting('company_name', 'Fair Surveying & Mapping Ltd');
+
+// Get program ID from URL parameter
+$programId = isset($_GET['program']) ? (int)$_GET['program'] : null;
+$selectedProgram = null;
+
+// Get all active training programs
+$trainingPrograms = dbGetRows("SELECT * FROM training_programs WHERE status = 'active' ORDER BY sort_order ASC, title ASC");
+
+// Group programs by category
+$programsByCategory = [];
+foreach ($trainingPrograms as $program) {
+    if (!empty($program['category'])) {
+        $programsByCategory[$program['category']][] = $program;
+    }
+}
+
+// Get selected program if ID provided
+if ($programId) {
+    foreach ($trainingPrograms as $program) {
+        if ($program['id'] == $programId) {
+            $selectedProgram = $program;
+            break;
+        }
+    }
+}
+
+// Handle form submission
+$enrollmentSuccess = false;
+$enrollmentId = null;
+$errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Process enrollment form
+    $name = trim($_POST['firstName'] ?? '') . ' ' . trim($_POST['lastName'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $company = trim($_POST['company'] ?? '') ?: null;
+    $position = trim($_POST['position'] ?? '') ?: null;
+    $experienceLevel = $_POST['experienceLevel'] ?? 'beginner';
+    $specialRequirements = trim($_POST['specialRequirements'] ?? '') ?: null;
+    $scheduleId = (int)($_POST['scheduleId'] ?? 0);
+    
+    // Validation
+    if (empty($name) || strlen(trim($name)) < 3) {
+        $errors[] = 'Full name is required';
+    }
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Valid email address is required';
+    }
+    if (empty($phone)) {
+        $errors[] = 'Phone number is required';
+    }
+    if (empty($scheduleId)) {
+        $errors[] = 'Please select a training schedule';
+    }
+    
+    // If no errors, save to database
+    if (empty($errors)) {
+        try {
+            $sql = "INSERT INTO training_enrollments (schedule_id, name, email, phone, company, position, experience_level, special_requirements, enrollment_status, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+            
+            $stmt = dbPrepare($sql);
+            $stmt->execute([$scheduleId, $name, $email, $phone, $company, $position, $experienceLevel, $specialRequirements]);
+            
+            $enrollmentId = dbLastInsertId();
+            $enrollmentSuccess = true;
+            
+        } catch (Exception $e) {
+            $errors[] = 'An error occurred while processing your enrollment. Please try again.';
+        }
+    }
+}
+
+// Categories mapping
+$categoryMap = [
+    'surveying' => ['label' => 'Surveying Equipment', 'icon' => 'fas fa-compass'],
+    'software' => ['label' => 'Software & Data', 'icon' => 'fas fa-laptop-code'],
+    'gis' => ['label' => 'GIS & Remote Sensing', 'icon' => 'fas fa-satellite'],
+    'advanced' => ['label' => 'Advanced Technologies', 'icon' => 'fas fa-rocket'],
+    'mapping' => ['label' => 'Mapping & Cartography', 'icon' => 'fas fa-map'],
+    'photogrammetry' => ['label' => 'Photogrammetry', 'icon' => 'fas fa-camera'],
+    'drone' => ['label' => 'Drone Technology', 'icon' => 'fas fa-helicopter'],
+    'cad' => ['label' => 'CAD & Design', 'icon' => 'fas fa-drafting-compass']
+];
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Course Enrollment - Fair Surveying & Mapping Ltd</title>
+    <title><?php echo htmlspecialchars(getSetting('meta_title', 'Course Enrollment - ' . $companyName)); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars(getSetting('meta_description', 'Enroll in professional training programs for surveying, mapping, and geospatial technologies.')); ?>" />
     <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
     <link
       rel="stylesheet"
@@ -29,9 +123,9 @@
               training programs
             </p>
             <div class="breadcrumbs">
-              <a href="../index.html">Home</a>
+              <a href="../index.php">Home</a>
               <i class="fas fa-chevron-right"></i>
-              <a href="training.html">Training</a>
+              <a href="training.php">Training</a>
               <i class="fas fa-chevron-right"></i>
               <span>Enrollment</span>
             </div>
@@ -80,7 +174,34 @@
           <div class="enrollment-layout">
             <!-- Main Form Area -->
             <div class="form-container" data-aos="fade-up">
-              <form id="enrollmentForm">
+              <?php if ($enrollmentSuccess): ?>
+              <!-- Success Message -->
+              <div class="enrollment-success-message">
+                <div class="success-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Enrollment Successful!</h2>
+                <p>Thank you for enrolling in our training program. Your enrollment ID is <strong>#<?php echo $enrollmentId; ?></strong></p>
+                <p>We've sent a confirmation email to <strong><?php echo htmlspecialchars($email ?? ''); ?></strong> with all the details.</p>
+                <div class="success-actions">
+                  <a href="training.php" class="btn-primary">Return to Training</a>
+                  <a href="contact.php" class="btn-secondary">Contact Us</a>
+                </div>
+              </div>
+              <?php else: ?>
+              
+              <?php if (!empty($errors)): ?>
+              <div class="error-messages">
+                <h3><i class="fas fa-exclamation-triangle"></i> Please correct the following errors:</h3>
+                <ul>
+                  <?php foreach ($errors as $error): ?>
+                  <li><?php echo htmlspecialchars($error); ?></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+              <?php endif; ?>
+              
+              <form id="enrollmentForm" method="POST" action="">
                 <!-- Step 1: Personal Information -->
                 <div class="form-step active" id="step1">
                   <h2>Personal Information</h2>
@@ -98,6 +219,7 @@
                         type="text"
                         id="firstName"
                         name="firstName"
+                        value="<?php echo htmlspecialchars($_POST['firstName'] ?? ''); ?>"
                         required
                       />
                       <span class="error-message"></span>
@@ -110,6 +232,7 @@
                         type="text"
                         id="lastName"
                         name="lastName"
+                        value="<?php echo htmlspecialchars($_POST['lastName'] ?? ''); ?>"
                         required
                       />
                       <span class="error-message"></span>
@@ -121,14 +244,14 @@
                       <label for="email"
                         >Email Address <span class="required">*</span></label
                       >
-                      <input type="email" id="email" name="email" required />
+                      <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required />
                       <span class="error-message"></span>
                     </div>
                     <div class="form-group">
                       <label for="phone"
                         >Phone Number <span class="required">*</span></label
                       >
-                      <input type="tel" id="phone" name="phone" required />
+                      <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" required />
                       <span class="error-message"></span>
                     </div>
                   </div>
@@ -138,11 +261,25 @@
                       <label for="company"
                         >Company/Organization (Optional)</label
                       >
-                      <input type="text" id="company" name="company" />
+                      <input type="text" id="company" name="company" value="<?php echo htmlspecialchars($_POST['company'] ?? ''); ?>" />
                     </div>
                     <div class="form-group">
                       <label for="position">Job Title (Optional)</label>
-                      <input type="text" id="position" name="position" />
+                      <input type="text" id="position" name="position" value="<?php echo htmlspecialchars($_POST['position'] ?? ''); ?>" />
+                    </div>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="experienceLevel"
+                        >Experience Level <span class="required">*</span></label
+                      >
+                      <select id="experienceLevel" name="experienceLevel" required>
+                        <option value="beginner" <?php echo ($_POST['experienceLevel'] ?? '') === 'beginner' ? 'selected' : ''; ?>>Beginner</option>
+                        <option value="intermediate" <?php echo ($_POST['experienceLevel'] ?? '') === 'intermediate' ? 'selected' : ''; ?>>Intermediate</option>
+                        <option value="advanced" <?php echo ($_POST['experienceLevel'] ?? '') === 'advanced' ? 'selected' : ''; ?>>Advanced</option>
+                      </select>
+                      <span class="error-message"></span>
                     </div>
                   </div>
 
@@ -205,10 +342,12 @@
                         required
                       >
                         <option value="">-- Select Category --</option>
-                        <option value="surveying">Surveying Equipment</option>
-                        <option value="software">Software & Data</option>
-                        <option value="gis">GIS & Remote Sensing</option>
-                        <option value="advanced">Advanced Technologies</option>
+                        <?php foreach ($categoryMap as $categoryKey => $categoryInfo): 
+                          if (isset($programsByCategory[$categoryKey])): ?>
+                        <option value="<?php echo htmlspecialchars($categoryKey); ?>" <?php echo ($_POST['courseCategory'] ?? '') === $categoryKey ? 'selected' : ''; ?>>
+                          <?php echo htmlspecialchars($categoryInfo['label']); ?>
+                        </option>
+                        <?php endif; endforeach; ?>
                       </select>
                       <span class="error-message"></span>
                     </div>
@@ -216,38 +355,65 @@
 
                   <div class="form-row">
                     <div class="form-group full-width">
-                      <label for="courseSelect"
-                        >Course <span class="required">*</span></label
+                      <label for="programSelect"
+                        >Training Program <span class="required">*</span></label
                       >
                       <select
-                        id="courseSelect"
-                        name="courseSelect"
+                        id="programSelect"
+                        name="programSelect"
                         required
-                        disabled
                       >
-                        <option value="">-- Select Course --</option>
+                        <option value="">-- Select Program --</option>
+                        <?php foreach ($trainingPrograms as $program): ?>
+                        <option value="<?php echo $program['id']; ?>" 
+                                data-category="<?php echo htmlspecialchars($program['category']); ?>"
+                                data-price="<?php echo $program['price']; ?>"
+                                data-duration="<?php echo htmlspecialchars($program['duration']); ?>"
+                                <?php echo ($selectedProgram && $selectedProgram['id'] == $program['id']) || ($_POST['programSelect'] ?? '') == $program['id'] ? 'selected' : ''; ?>>
+                          <?php echo htmlspecialchars($program['title']); ?>
+                        </option>
+                        <?php endforeach; ?>
                       </select>
                       <span class="error-message"></span>
                     </div>
                   </div>
 
                   <div class="course-details" id="courseDetails">
-                    <!-- Course details will be displayed here -->
+                    <?php if ($selectedProgram): ?>
+                    <div class="selected-course-info">
+                      <h3><?php echo htmlspecialchars($selectedProgram['title']); ?></h3>
+                      <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> <?php echo htmlspecialchars($selectedProgram['duration']); ?></span>
+                        <span><i class="fas fa-users"></i> Max <?php echo htmlspecialchars($selectedProgram['max_students'] ?? '15'); ?> Students</span>
+                        <span><i class="fas fa-globe"></i> <?php echo htmlspecialchars($selectedProgram['language'] ?? 'English'); ?></span>
+                        <span><i class="fas fa-tag"></i> <?php echo htmlspecialchars(ucfirst($selectedProgram['level'] ?? 'beginner')); ?></span>
+                      </div>
+                      <p><?php echo htmlspecialchars($selectedProgram['short_description'] ?? $selectedProgram['description']); ?></p>
+                      <div class="course-price">
+                        <strong><?php echo !empty($selectedProgram['price']) ? number_format($selectedProgram['price'], 0, '.', ',') . ' RWF' : 'Contact for price'; ?></strong>
+                      </div>
+                    </div>
+                    <?php endif; ?>
                   </div>
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label for="sessionDate"
-                        >Preferred Start Date
+                      <label for="scheduleId"
+                        >Training Schedule
                         <span class="required">*</span></label
                       >
                       <select
-                        id="sessionDate"
-                        name="sessionDate"
+                        id="scheduleId"
+                        name="scheduleId"
                         required
-                        disabled
                       >
-                        <option value="">-- Select Date --</option>
+                        <option value="">-- Select Schedule --</option>
+                        <!-- Note: In a real implementation, you would have a training_schedules table -->
+                        <!-- For now, we'll create some sample schedules -->
+                        <option value="1" <?php echo ($_POST['scheduleId'] ?? '') == '1' ? 'selected' : ''; ?>>January 2025 - Weekdays (9:00 AM - 5:00 PM)</option>
+                        <option value="2" <?php echo ($_POST['scheduleId'] ?? '') == '2' ? 'selected' : ''; ?>>February 2025 - Weekends (8:00 AM - 4:00 PM)</option>
+                        <option value="3" <?php echo ($_POST['scheduleId'] ?? '') == '3' ? 'selected' : ''; ?>>March 2025 - Intensive (Full Week)</option>
+                        <option value="4" <?php echo ($_POST['scheduleId'] ?? '') == '4' ? 'selected' : ''; ?>>April 2025 - Evening Classes (6:00 PM - 9:00 PM)</option>
                       </select>
                       <span class="error-message"></span>
                     </div>
@@ -261,8 +427,9 @@
                         required
                       >
                         <option value="">-- Select Mode --</option>
-                        <option value="in-person">In-person</option>
-                        <option value="online">Online</option>
+                        <option value="in-person" <?php echo ($_POST['attendanceMode'] ?? '') === 'in-person' ? 'selected' : ''; ?>>In-person</option>
+                        <option value="online" <?php echo ($_POST['attendanceMode'] ?? '') === 'online' ? 'selected' : ''; ?>>Online</option>
+                        <option value="hybrid" <?php echo ($_POST['attendanceMode'] ?? '') === 'hybrid' ? 'selected' : ''; ?>>Hybrid (Online + In-person)</option>
                       </select>
                       <span class="error-message"></span>
                     </div>
@@ -277,7 +444,8 @@
                         id="specialRequirements"
                         name="specialRequirements"
                         rows="3"
-                      ></textarea>
+                        placeholder="Please describe any special requirements, dietary restrictions, accessibility needs, or other accommodations..."
+                      ><?php echo htmlspecialchars($_POST['specialRequirements'] ?? ''); ?></textarea>
                     </div>
                   </div>
 
@@ -363,15 +531,7 @@
                   </div>
 
                   <div class="form-navigation">
-                    <button type="button" class="btn-prev" data-prev="2">
-                      <i class="fas fa-arrow-left"></i>
-                      Back
-                    </button>
-                    <button
-                      type="button"
-                      class="btn-submit"
-                      id="completeEnrollment"
-                    >
+                    <button type="submit" class="btn-submit" id="completeEnrollment">
                       Complete Enrollment
                       <i class="fas fa-check-circle"></i>
                     </button>
@@ -432,12 +592,11 @@
                         <li>
                           <i class="fas fa-question-circle"></i> Contact us if
                           you have any questions
-                        </li>
                       </ul>
                     </div>
 
                     <div class="confirmation-actions">
-                      <a href="training.html" class="btn-secondary">
+                      <a href="training.php" class="btn-secondary">
                         <i class="fas fa-arrow-left"></i>
                         Return to Training
                       </a>
@@ -446,9 +605,9 @@
                         Download Receipt
                       </a>
                     </div>
-                  </div>
                 </div>
               </form>
+              <?php endif; ?>
             </div>
 
             <!-- Side Information -->
@@ -459,16 +618,16 @@
                   Our team is here to assist you with the enrollment process.
                 </p>
                 <div class="contact-options">
-                  <a href="tel:0788331697" class="contact-option">
+                  <a href="tel:<?php echo htmlspecialchars(getSetting('phone', '0788331697')); ?>" class="contact-option">
                     <i class="fas fa-phone"></i>
-                    <span>Call Us: 0788331697</span>
+                    <span>Call Us: <?php echo htmlspecialchars(getSetting('phone', '0788331697')); ?></span>
                   </a>
                   <a
-                    href="mailto:training@fairsurveying.com"
+                    href="mailto:<?php echo htmlspecialchars(getSetting('email', 'info@fairsurveying.com')); ?>"
                     class="contact-option"
                   >
                     <i class="fas fa-envelope"></i>
-                    <span>Email: training@fairsurveying.com</span>
+                    <span>Email: <?php echo htmlspecialchars(getSetting('email', 'info@fairsurveying.com')); ?></span>
                   </a>
                 </div>
               </div>

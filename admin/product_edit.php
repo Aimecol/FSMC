@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $sql = "UPDATE products SET 
                             title = ?, slug = ?, description = ?, short_description = ?, 
                             category = ?, manufacturer = ?, model = ?, specifications = ?, 
-                            price = ?, warranty = ?, support = ?, icon = ?, 
+                            price = ?, warranty = ?, support = ?, icon = ?, image = ?, 
                             status = ?, sort_order = ?, meta_title = ?, meta_description = ?, 
                             updated_at = NOW() 
                             WHERE id = ?";
@@ -134,9 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Create new product
                     $sql = "INSERT INTO products 
                             (title, slug, description, short_description, category, manufacturer, 
-                             model, specifications, price, warranty, support, icon, 
+                             model, specifications, price, warranty, support, icon, image, 
                              status, sort_order, meta_title, meta_description) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     
                     $newId = dbInsert($sql, array_values($data));
                     if ($newId) {

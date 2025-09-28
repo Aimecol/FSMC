@@ -10,7 +10,7 @@ require_once 'config/config.php';
 $pageTitle = 'Products Management';
 $pageIcon = 'fas fa-box';
 $pageDescription = 'Manage your equipment, software, and training materials';
-$pageActions = '<a href="product_edit.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Product</a>';
+$pageActions = '<a href="product_enquiries.php" class="btn btn-info me-2"><i class="fas fa-envelope"></i> View All Enquiries</a><a href="product_edit.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Product</a>';
 
 // Handle actions
 $action = $_GET['action'] ?? '';
@@ -231,6 +231,11 @@ include 'includes/header.php';
                                     <a href="product_edit.php?id=<?php echo $product['id']; ?>" 
                                        class="btn btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    <a href="product_enquiries.php?product_id=<?php echo $product['id']; ?>" 
+                                       class="btn btn-outline-info" title="View Enquiries">
+                                        <i class="fas fa-envelope"></i>
                                     </a>
                                     
                                     <form method="POST" style="display: inline;" 

@@ -1,9 +1,21 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+// Include database configuration
+require_once 'config/database.php';
+
+// Fetch data from database
+$services = dbGetRows("SELECT * FROM services WHERE status = 'active' ORDER BY sort_order ASC, created_at DESC LIMIT 3");
+$products = dbGetRows("SELECT * FROM products WHERE status = 'active' ORDER BY sort_order ASC, created_at DESC LIMIT 6");
+$trainings = dbGetRows("SELECT * FROM training_programs WHERE status = 'active' ORDER BY sort_order ASC, created_at DESC LIMIT 3");
+$researches = dbGetRows("SELECT * FROM research_projects WHERE status IN ('ongoing', 'completed', 'published') ORDER BY featured DESC, created_at DESC LIMIT 3");
+$companySettings = getCompanySettings();
+?>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fair Surveying & Mapping Ltd</title>
+    <title><?php echo getSetting('site_title', 'Fair Surveying & Mapping Ltd'); ?></title>
+    <meta name="description" content="<?php echo getSetting('site_description', 'Professional surveying and mapping services in Rwanda'); ?>">
     <link rel="icon" type="image/svg+xml" href="./images/logo.png" />
     <link
       rel="stylesheet"
@@ -21,15 +33,15 @@
       <div class="top-bar">
         <div class="top-bar-content">
           <div class="contact-info">
-            <a href="tel:0788331697"><i class="fas fa-phone"></i> 0788331697</a>
-            <a href="mailto:fsamcompanyltd@gmail.com"
-              ><i class="fas fa-envelope"></i> fsamcompanyltd@gmail.com</a
+            <a href="tel:<?php echo str_replace(' ', '', getSetting('company_phone', '0788331697')); ?>"><i class="fas fa-phone"></i> <?php echo getSetting('company_phone', '0788331697'); ?></a>
+            <a href="mailto:<?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?>"
+              ><i class="fas fa-envelope"></i> <?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?></a
             >
           </div>
           <div>
             <span
-              ><i class="fas fa-user-tie"></i> HATANGIMANA Fulgence, Surveyor
-              code: LS00280</span
+              ><i class="fas fa-user-tie"></i> <?php echo getSetting('surveyor_name', 'HATANGIMANA Fulgence'); ?>, Surveyor
+              code: <?php echo getSetting('surveyor_code', 'LS00280'); ?></span
             >
           </div>
         </div>
@@ -295,7 +307,7 @@
                 text-anchor="middle"
               >
                 <textPath href="#textPath" startOffset="50%">
-                  FAIR SURVEYING & MAPPING LTD
+                  <?php echo strtoupper(getSetting('company_name', 'FAIR SURVEYING & MAPPING LTD')); ?>
                 </textPath>
               </text>
 
@@ -312,7 +324,7 @@
                 text-anchor="middle"
               >
                 <textPath href="#textPath2" startOffset="50%">
-                  Reliable | Professional | Expert Solutions
+                  <?php echo getSetting('company_tagline', 'Reliable | Professional | Expert Solutions'); ?>
                 </textPath>
               </text>
 
@@ -326,14 +338,14 @@
                 fill="#1a5276"
                 text-anchor="middle"
               >
-                EST. 2023
+                EST. <?php echo getSetting('establishment_year', '2023'); ?>
               </text>
             </svg>
           </div>
           <div class="logo-text">
-            <div class="logo-name">FAIR SURVEYING & MAPPING LTD</div>
+            <div class="logo-name"><?php echo strtoupper(getSetting('company_name', 'FAIR SURVEYING & MAPPING LTD')); ?></div>
             <div class="logo-tagline">
-              Reliable | Professional | Expert Solutions
+              <?php echo getSetting('company_tagline', 'Reliable | Professional | Expert Solutions'); ?>
             </div>
           </div>
         </div>
@@ -400,104 +412,47 @@
     <section id="services" class="services">
       <div class="container">
         <div class="services-grid">
-          <!-- Service Card 1 -->
+          <?php foreach ($services as $service): 
+            $languages = json_decode($service['languages'], true) ?: [];
+          ?>
           <div class="service-card">
             <div class="service-card-header">
-              <h3>First Registration</h3>
-              <i class="fas fa-file-signature"></i>
+              <h3><?php echo htmlspecialchars($service['title']); ?></h3>
+              <i class="<?php echo htmlspecialchars($service['icon'] ?: 'fas fa-cogs'); ?>"></i>
             </div>
             <div class="service-card-content">
+              <?php if (!empty($languages)): ?>
               <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
+                <?php foreach ($languages as $language): ?>
+                <span class="language-tag">
+                  <i class="fas fa-globe"></i> <?php echo htmlspecialchars($language); ?>
+                </span>
+                <?php endforeach; ?>
               </div>
-              <p>
-                We offer comprehensive first-time registration services for land
-                parcels, ensuring accurate measurements and legal documentation
-                for your property.
-              </p>
-              <p>
-                Our team uses state-of-the-art equipment to survey your land and
-                prepare all necessary documentation required by land
-                registration authorities.
-              </p>
+              <?php endif; ?>
+              
+              <?php if (!empty($service['short_description'])): ?>
+              <p><?php echo htmlspecialchars($service['short_description']); ?></p>
+              <?php endif; ?>
+              
+              <p><?php echo nl2br(htmlspecialchars(substr($service['description'], 0, 200))); ?>...</p>
+              
               <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
+                <a href="./pages/service_view_more.php?slug=<?php echo urlencode($service['slug']); ?>" class="btn-service">
                   <i class="fas fa-info-circle"></i> Learn More
                 </a>
               </div>
             </div>
           </div>
-
-          <!-- Service Card 2 -->
+          <?php endforeach; ?>
+          
+          <?php if (empty($services)): ?>
           <div class="service-card">
-            <div class="service-card-header">
-              <h3>Merging Land Parcels</h3>
-              <i class="fas fa-object-group"></i>
-            </div>
             <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We provide professional services for merging multiple land
-                parcels into a single property, ensuring compliance with all
-                legal requirements.
-              </p>
-              <p>
-                Our experienced surveyors handle the entire process, from
-                initial surveys to final documentation and registration of the
-                merged property.
-              </p>
-              <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
+              <p>No services available at the moment.</p>
             </div>
           </div>
-
-          <!-- Service Card 3 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Land Subdivision</h3>
-              <i class="fas fa-cut"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We specialize in dividing land parcels into smaller portions,
-                ensuring accurate measurements and proper documentation for each
-                new parcel.
-              </p>
-              <p>
-                Our team ensures all subdivisions comply with local zoning laws
-                and regulations, providing you with legally recognized property
-                divisions.
-              </p>
-              <div class="service-cta">
-                <a href="./pages/service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -512,104 +467,49 @@
           </p>
         </div>
 
-        <div class="products-slider">
-          <div class="product-card" data-category="equipment">
+        <div class="products-slider" style="padding-left: 0; padding-right: 0;">
+          <?php foreach ($products as $product): 
+            $specifications = json_decode($product['specifications'], true) ?: [];
+          ?>
+          <div class="product-card" data-category="<?php echo htmlspecialchars($product['category']); ?>">
             <div class="product-image">
-              <img src="./images/total-station.jpg" alt="">
+              <img src="<?php echo getFileUrl($product['image']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
             </div>
             <div class="product-details">
-              <h3 class="product-title">Total Station</h3>
+              <h3 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h3>
               <p class="product-description">
-                High-precision surveying instrument for accurate measurements in
-                the field.
+                <?php echo htmlspecialchars($product['short_description'] ?: substr($product['description'], 0, 100) . '...'); ?>
               </p>
+              
+              <?php if (!empty($specifications)): ?>
               <ul class="product-features">
+                <?php foreach (array_slice($specifications, 0, 3) as $spec): ?>
                 <li>
-                  <i class="fas fa-check-circle"></i> Angular accuracy: 2"
+                  <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($spec); ?>
                 </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Range: Up to 500m without
-                  prism
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Battery life: 8 hours
-                </li>
+                <?php endforeach; ?>
               </ul>
+              <?php endif; ?>
+              
               <div class="product-actions">
-                <button class="btn-details" data-product="total-station">
+                <button class="btn-details" data-product="<?php echo htmlspecialchars($product['slug']); ?>">
                   View Details
                 </button>
-                <button class="btn-inquire" data-product="total-station">
+                <button class="btn-inquire" data-product="<?php echo htmlspecialchars($product['slug']); ?>">
                   Inquire
                 </button>
               </div>
             </div>
           </div>
-
-          <div class="product-card" data-category="equipment">
-            <div class="product-image">
-              <img src="./images/differential-gps.jpg" alt="">
-            </div>
+          <?php endforeach; ?>
+          
+          <?php if (empty($products)): ?>
+          <div class="product-card">
             <div class="product-details">
-              <h3 class="product-title">Differential GPS</h3>
-              <p class="product-description">
-                Real-time kinematic GPS system for centimeter-level positioning
-                accuracy.
-              </p>
-              <ul class="product-features">
-                <li>
-                  <i class="fas fa-check-circle"></i> Horizontal accuracy: 8mm +
-                  1ppm
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Vertical accuracy: 15mm +
-                  1ppm
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Tracking: GPS, GLONASS,
-                  Galileo
-                </li>
-              </ul>
-              <div class="product-actions">
-                <button class="btn-details" data-product="rtk-gps">
-                  View Details
-                </button>
-                <button class="btn-inquire" data-product="rtk-gps">
-                  Inquire
-                </button>
-              </div>
+              <p>No products available at the moment.</p>
             </div>
           </div>
-
-          <div class="product-card" data-category="equipment">
-            <div class="product-image">
-              <img src="./images/digital-level.jpg" alt="">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">Digital Level</h3>
-              <p class="product-description">
-                Precise digital leveling instrument for elevation measurements.
-              </p>
-              <ul class="product-features">
-                <li>
-                  <i class="fas fa-check-circle"></i> Height accuracy: 0.3mm/km
-                </li>
-                <li><i class="fas fa-check-circle"></i> Range: Up to 100m</li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Internal memory: 2,000
-                  measurements
-                </li>
-              </ul>
-              <div class="product-actions">
-                <button class="btn-details" data-product="digital-level">
-                  View Details
-                </button>
-                <button class="btn-inquire" data-product="digital-level">
-                  Inquire
-                </button>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
 
         <div class="slider-controls">
@@ -633,117 +533,56 @@
           </p>
         </div>
         <div class="courses-grid active" id="surveying-courses">
-          <div class="course-card" data-aos="fade-up">
+          <?php foreach ($trainings as $index => $training): 
+            $curriculum = json_decode($training['curriculum'], true) ?: [];
+            $features = json_decode($training['features'], true) ?: [];
+          ?>
+          <div class="course-card" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
             <div class="course-image">
               <img
-                src="./images/9ymlPUvjUSWPlrk-qrJ2k.jpg"
-                alt="Total Station Training"
+                src="<?php echo getFileUrl($training['image']); ?>"
+                alt="<?php echo htmlspecialchars($training['title']); ?>"
               />
-              <div class="course-level intermediate">Intermediate</div>
+              <div class="course-level <?php echo htmlspecialchars($training['level']); ?>"><?php echo ucfirst($training['level']); ?></div>
             </div>
             <div class="course-content">
-              <h3>Total Station Masterclass</h3>
+              <h3><?php echo htmlspecialchars($training['title']); ?></h3>
               <div class="course-meta">
-                <span><i class="far fa-clock"></i> 3 Days</span>
-                <span><i class="fas fa-users"></i> Max 12 Students</span>
-                <span><i class="fas fa-globe"></i> English</span>
+                <?php if (!empty($training['duration'])): ?>
+                <span><i class="far fa-clock"></i> <?php echo htmlspecialchars($training['duration']); ?></span>
+                <?php endif; ?>
+                <span><i class="fas fa-users"></i> Max <?php echo $training['max_students']; ?> Students</span>
+                <span><i class="fas fa-globe"></i> <?php echo htmlspecialchars($training['language']); ?></span>
               </div>
               <p>
-                Master the operation and advanced features of modern total
-                stations for precision surveying.
+                <?php echo htmlspecialchars($training['short_description'] ?: substr($training['description'], 0, 120) . '...'); ?>
               </p>
+              
+              <?php if (!empty($features)): ?>
               <ul class="course-features">
+                <?php foreach (array_slice($features, 0, 3) as $feature): ?>
                 <li>
-                  <i class="fas fa-check-circle"></i> Setup and calibration
+                  <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($feature); ?>
                 </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Data collection
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Troubleshooting in the
-                  field
-                </li>
+                <?php endforeach; ?>
               </ul>
+              <?php endif; ?>
+              
               <div class="course-footer">
-                <span class="course-price">75,000 RWF</span>
-                <a href="#" class="btn-enroll">Enroll Now</a>
+                <span class="course-price"><?php echo formatPrice($training['price']); ?></span>
+                <a href="./pages/training_view_more.php?slug=<?php echo urlencode($training['slug']); ?>" class="btn-enroll">Enroll Now</a>
               </div>
             </div>
           </div>
-
-          <div class="course-card" data-aos="fade-up" data-aos-delay="100">
-            <div class="course-image">
-              <img
-                src="./images/9c_NLZ75_JAwFH7mjiGB_.jpg"
-                alt="GPS Systems Training"
-              />
-              <div class="course-level beginner">Beginner</div>
-            </div>
+          <?php endforeach; ?>
+          
+          <?php if (empty($trainings)): ?>
+          <div class="course-card">
             <div class="course-content">
-              <h3>GPS Systems Fundamentals</h3>
-              <div class="course-meta">
-                <span><i class="far fa-clock"></i> 2 Days</span>
-                <span><i class="fas fa-users"></i> Max 10 Students</span>
-                <span><i class="fas fa-globe"></i> English</span>
-              </div>
-              <p>
-                Learn the fundamentals of GPS/GNSS technology and handheld
-                receivers for field measurements.
-              </p>
-              <ul class="course-features">
-                <li>
-                  <i class="fas fa-check-circle"></i> GPS principles and
-                  limitations
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Field collection
-                  techniques
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Data processing workflows
-                </li>
-              </ul>
-              <div class="course-footer">
-                <span class="course-price">50,000 RWF</span>
-                <a href="#" class="btn-enroll">Enroll Now</a>
-              </div>
+              <p>No training programs available at the moment.</p>
             </div>
           </div>
-
-          <div class="course-card" data-aos="fade-up" data-aos-delay="200">
-            <div class="course-image">
-              <img
-                src="./images/bhHQ2-XvUG3QKct5kwamE.jpg"
-                alt="RTK GPS Advanced Training"
-              />
-              <div class="course-level advanced">Advanced</div>
-            </div>
-            <div class="course-content">
-              <h3>RTK GPS Advanced Techniques</h3>
-              <div class="course-meta">
-                <span><i class="far fa-clock"></i> 4 Days</span>
-                <span><i class="fas fa-users"></i> Max 8 Students</span>
-                <span><i class="fas fa-globe"></i> English</span>
-              </div>
-              <p>
-                Advanced training on RTK GPS systems for centimeter-level
-                accuracy in real-time surveying.
-              </p>
-              <ul class="course-features">
-                <li><i class="fas fa-check-circle"></i> Base & rover setup</li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Network RTK solutions
-                </li>
-                <li>
-                  <i class="fas fa-check-circle"></i> Quality control procedures
-                </li>
-              </ul>
-              <div class="course-footer">
-                <span class="course-price">120,000 RWF</span>
-                <a href="#" class="btn-enroll">Enroll Now</a>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -758,106 +597,56 @@
           </p>
         </div>
         <div class="projects-grid">
-          <!-- Project 1 -->
+          <?php foreach ($researches as $index => $research): 
+            $authors = json_decode($research['authors'], true) ?: [];
+            $keywords = json_decode($research['keywords'], true) ?: [];
+          ?>
           <div
             class="project-card"
-            data-category="remote-sensing"
+            data-category="<?php echo htmlspecialchars($research['category'] ?: 'general'); ?>"
             data-aos="fade-up"
+            data-aos-delay="<?php echo $index * 100; ?>"
           >
             <div class="project-image">
               <img
-                src="./images/rC9AvGLJMT6thyTyTxB--.jpg"
-                alt="Remote Sensing Applications"
+                src="<?php echo getFileUrl($research['image']); ?>"
+                alt="<?php echo htmlspecialchars($research['title']); ?>"
               />
               <div class="project-overlay">
-                <span class="project-category">Remote Sensing</span>
-                <a href="#project-1" class="btn-view-project">View Project</a>
+                <span class="project-category"><?php echo ucfirst(str_replace('_', ' ', $research['category'] ?: 'General')); ?></span>
+                <a href="./pages/research_view_more.php?slug=<?php echo urlencode($research['slug']); ?>" class="btn-view-project">View Project</a>
               </div>
             </div>
             <div class="project-content">
-              <h3>Remote Sensing Applications for Land Cover Mapping</h3>
+              <h3><?php echo htmlspecialchars($research['title']); ?></h3>
               <p>
-                Developing advanced techniques for automated land cover
-                classification using multi-spectral satellite imagery and
-                machine learning algorithms.
+                <?php echo htmlspecialchars(substr($research['abstract'] ?: $research['description'], 0, 150) . '...'); ?>
               </p>
               <div class="project-meta">
+                <?php if (!empty($research['publication_date'])): ?>
                 <div class="meta-item">
-                  <i class="fas fa-calendar-alt"></i> 2024-2025
+                  <i class="fas fa-calendar-alt"></i> <?php echo date('Y', strtotime($research['publication_date'])); ?>
                 </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($authors)): ?>
                 <div class="meta-item">
-                  <i class="fas fa-user"></i>  HATANGIMANA F.
+                  <i class="fas fa-user"></i> <?php echo htmlspecialchars(implode(', ', array_slice($authors, 0, 2))); ?>
+                  <?php if (count($authors) > 2): ?>et al.<?php endif; ?>
                 </div>
+                <?php endif; ?>
               </div>
             </div>
           </div>
-
-          <!-- Project 2 -->
-          <div
-            class="project-card"
-            data-category="geospatial"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="project-image">
-              <img src="./images/9ymlPUvjUSWPlrk-qrJ2k.jpg" alt="3D Terrain Modeling" />
-              <div class="project-overlay">
-                <span class="project-category">Geospatial</span>
-                <a href="#project-2" class="btn-view-project">View Project</a>
-              </div>
-            </div>
+          <?php endforeach; ?>
+          
+          <?php if (empty($researches)): ?>
+          <div class="project-card">
             <div class="project-content">
-              <h3>Advanced 3D Terrain Modeling Using Drone Photogrammetry</h3>
-              <p>
-                Creating high-precision digital terrain models using
-                drone-captured imagery for applications in infrastructure
-                planning and natural hazard assessment.
-              </p>
-              <div class="project-meta">
-                <div class="meta-item">
-                  <i class="fas fa-calendar-alt"></i> 2023-2025
-                </div>
-                <div class="meta-item">
-                  <i class="fas fa-user"></i>  HATANGIMANA F.
-                </div>
-              </div>
+              <p>No research projects available at the moment.</p>
             </div>
           </div>
-
-          <!-- Project 3 -->
-          <div
-            class="project-card"
-            data-category="environmental"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="project-image">
-              <img
-                src="./images/bhHQ2-XvUG3QKct5kwamE.jpg"
-                alt="Water Resource Management"
-              />
-              <div class="project-overlay">
-                <span class="project-category">Environmental</span>
-                <a href="#project-3" class="btn-view-project">View Project</a>
-              </div>
-            </div>
-            <div class="project-content">
-              <h3>Integrated Water Resource Management System</h3>
-              <p>
-                Developing a comprehensive system for monitoring and managing
-                water resources using satellite data, IoT sensors, and
-                predictive analytics.
-              </p>
-              <div class="project-meta">
-                <div class="meta-item">
-                  <i class="fas fa-calendar-alt"></i> 2023-2024
-                </div>
-                <div class="meta-item">
-                  <i class="fas fa-user"></i>  HATANGIMANA F.
-                </div>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -887,19 +676,19 @@
           <div class="footer-column">
             <h3>About Us</h3>
             <p style="color: #aaa; margin-bottom: 20px; line-height: 1.6">
-              Banner Fair Surveying & Mapping Ltd provides reliable,
+              <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?> provides reliable,
               professional, and expert solutions for all your surveying and
               mapping needs.
             </p>
             <div class="social-links">
-              <a href="#" class="social-link"
+              <a href="<?php echo getSetting('facebook_url', '#'); ?>" class="social-link"
                 ><i class="fab fa-facebook-f"></i
               ></a>
-              <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="social-link"
+              <a href="<?php echo getSetting('twitter_url', '#'); ?>" class="social-link"><i class="fab fa-twitter"></i></a>
+              <a href="<?php echo getSetting('linkedin_url', '#'); ?>" class="social-link"
                 ><i class="fab fa-linkedin-in"></i
               ></a>
-              <a href="#" class="social-link"
+              <a href="<?php echo getSetting('instagram_url', '#'); ?>" class="social-link"
                 ><i class="fab fa-instagram"></i
               ></a>
             </div>
@@ -967,16 +756,16 @@
           </div>
           <div class="footer-column footer-contact">
             <h3>Contact Us</h3>
-            <p><i class="fas fa-map-marker-alt"></i> Kigali, Rwanda</p>
-            <p><i class="fas fa-phone"></i> +250 788 331 697</p>
-            <p><i class="fas fa-envelope"></i> fsamcompanyltd@gmail.com</p>
-            <p><i class="fas fa-user-tie"></i> Surveyor Code: LS00280</p>
+            <p><i class="fas fa-map-marker-alt"></i> <?php echo getSetting('company_address', 'Kigali, Rwanda'); ?></p>
+            <p><i class="fas fa-phone"></i> <?php echo getSetting('company_phone', '+250 788 331 697'); ?></p>
+            <p><i class="fas fa-envelope"></i> <?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?></p>
+            <p><i class="fas fa-user-tie"></i> Surveyor Code: <?php echo getSetting('surveyor_code', 'LS00280'); ?></p>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
         <div class="copyright">
-          &copy; 2025 Banner Fair Surveying & Mapping Ltd. All Rights Reserved.
+          &copy; <?php echo date('Y'); ?> <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?>. All Rights Reserved.
         </div>
         <div class="footer-nav">
           <a href="#">Privacy Policy</a>

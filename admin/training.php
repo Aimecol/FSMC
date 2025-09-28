@@ -11,7 +11,7 @@ require_once 'config/config.php';
 $pageTitle = 'Training Programs Management';
 $pageIcon = 'fas fa-graduation-cap';
 $pageDescription = 'Manage your training courses and programs';
-$pageActions = '<a href="training_edit.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Program</a>';
+$pageActions = '<a href="training_enrollments.php" class="btn btn-info me-2"><i class="fas fa-users"></i> View All Enrollments</a><a href="training_edit.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Program</a>';
 
 // Handle actions
 $action = $_GET['action'] ?? '';
@@ -286,6 +286,11 @@ include 'includes/header.php';
                                     <a href="training_edit.php?id=<?php echo $program['id']; ?>" 
                                        class="btn btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    <a href="training_enrollments.php?program_id=<?php echo $program['id']; ?>" 
+                                       class="btn btn-outline-success" title="View Enrollments">
+                                        <i class="fas fa-users"></i>
                                     </a>
                                     
                                     <a href="training_view.php?id=<?php echo $program['id']; ?>" 

@@ -1,9 +1,18 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+// Include database configuration
+require_once './config/database.php';
+
+// Fetch services from database
+$services = dbGetRows("SELECT * FROM services WHERE status = 'active' ORDER BY sort_order ASC, created_at DESC");
+$companySettings = getCompanySettings();
+?>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Our Services - Banner Fair Surveying & Mapping Ltd</title>
+    <title>Our Services - <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?></title>
+    <meta name="description" content="Professional surveying and mapping services by <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?>">
     <link rel="icon" type="image/svg+xml" href="../images/logo.png" />
     <link
       rel="stylesheet"
@@ -22,474 +31,77 @@
       <section class="services-hero">
         <h1>Our Professional Services</h1>
         <p>
-          Banner Fair Surveying and Mapping Ltd provides comprehensive
+          <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?> provides comprehensive
           surveying, mapping, and technical services with precision and
           expertise. Our team of qualified professionals ensures accuracy and
           excellence in all projects.
         </p>
       </section>
 
-      <!-- Services Tabs -->
-      <div class="services-tabs">
-        <button class="tab-btn active" data-category="land-surveying">
-          <i class="fas fa-map"></i> Land Surveying
-        </button>
-        <button class="tab-btn" data-category="building-construction">
-          <i class="fas fa-building"></i> Building & Construction
-        </button>
-        <button class="tab-btn" data-category="environmental">
-          <i class="fas fa-leaf"></i> Environmental
-        </button>
-        <button class="tab-btn" data-category="technical-training">
-          <i class="fas fa-graduation-cap"></i> Technical Training
-        </button>
-      </div>
-
-      <!-- Land Surveying Section -->
-      <section class="service-category active" id="land-surveying">
-        <h2 class="category-heading">
-          <i class="fas fa-map-marked-alt"></i> Land Surveying & Mapping
-          Services
-        </h2>
+      <!-- Services Section -->
+      <section class="services-section">
         <div class="services-grid">
-          <!-- Service Card 1 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>First Registration</h3>
-              <i class="fas fa-file-signature"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
+          <?php if (!empty($services)): ?>
+            <?php foreach ($services as $service): 
+              $languages = json_decode($service['languages'], true) ?: [];
+              $features = json_decode($service['features'], true) ?: [];
+            ?>
+            <div class="service-card">
+              <div class="service-card-header">
+                <h3><?php echo htmlspecialchars($service['title']); ?></h3>
+                <i class="<?php echo htmlspecialchars($service['icon'] ?: 'fas fa-cogs'); ?>"></i>
               </div>
-              <p>
-                We offer comprehensive first-time registration services for land
-                parcels, ensuring accurate measurements and legal documentation
-                for your property.
-              </p>
-              <p>
-                Our team uses state-of-the-art equipment to survey your land and
-                prepare all necessary documentation required by land
-                registration authorities.
-              </p>
-              <div class="service-cta">
-                <a href="./service_view_more.php" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 2 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Merging Land Parcels</h3>
-              <i class="fas fa-object-group"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We provide professional services for merging multiple land
-                parcels into a single property, ensuring compliance with all
-                legal requirements.
-              </p>
-              <p>
-                Our experienced surveyors handle the entire process, from
-                initial surveys to final documentation and registration of the
-                merged property.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
+              <div class="service-card-content">
+                <?php if (!empty($languages)): ?>
+                <div class="service-languages">
+                  <?php foreach ($languages as $language): ?>
+                  <span class="language-tag">
+                    <i class="fas fa-globe"></i> <?php echo htmlspecialchars($language); ?>
+                  </span>
+                  <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($service['short_description'])): ?>
+                <p><?php echo htmlspecialchars($service['short_description']); ?></p>
+                <?php endif; ?>
+                
+                <p><?php echo nl2br(htmlspecialchars(substr($service['description'], 0, 200))); ?>...</p>
+                
+                <?php if (!empty($service['price']) && $service['price'] > 0): ?>
+                <div class="service-price">
+                  <strong>Price: <?php echo formatPrice($service['price']); ?></strong>
+                </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($service['duration'])): ?>
+                <div class="service-duration">
+                  <i class="fas fa-clock"></i> Duration: <?php echo htmlspecialchars($service['duration']); ?>
+                </div>
+                <?php endif; ?>
+                
+                <div class="service-cta">
+                  <a href="./service_view_more.php?slug=<?php echo urlencode($service['slug']); ?>" class="btn-service">
+                    <i class="fas fa-info-circle"></i> Learn More
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-
-          <!-- Service Card 3 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Land Subdivision</h3>
-              <i class="fas fa-cut"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We specialize in dividing land parcels into smaller portions,
-                ensuring accurate measurements and proper documentation for each
-                new parcel.
-              </p>
-              <p>
-                Our team ensures all subdivisions comply with local zoning laws
-                and regulations, providing you with legally recognized property
-                divisions.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="service-card">
+              <div class="service-card-content">
+                <p>No services available at the moment. Please check back later.</p>
               </div>
             </div>
-          </div>
-
-          <!-- Service Card 4 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Boundary Correction</h3>
-              <i class="fas fa-border-style"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We offer professional boundary correction services to resolve
-                disputes and ensure accurate property lines between neighboring
-                properties.
-              </p>
-              <p>
-                Using advanced surveying equipment, we can accurately determine
-                and correct property boundaries, providing legal documentation
-                for the updated boundaries.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </section>
 
-      <!-- Building & Construction Section -->
-      <section class="service-category" id="building-construction">
-        <h2 class="category-heading">
-          <i class="fas fa-building"></i> Building & Construction Support
-        </h2>
-        <div class="services-grid">
-          <!-- Service Card 1 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Building Permits</h3>
-              <i class="fas fa-clipboard-check"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> French</span
-                >
-              </div>
-              <p>
-                We assist clients in obtaining building permits (Autorisation de
-                Bâtir) by preparing all required documentation and navigating
-                the approval process.
-              </p>
-              <p>
-                Our team has extensive experience with local building
-                regulations and maintains excellent relationships with relevant
-                authorities.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 2 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Road Consultancy</h3>
-              <i class="fas fa-road"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We provide comprehensive road consultancy services including
-                mapping, design, and planning for both public and private road
-                projects.
-              </p>
-              <p>
-                Our team utilizes advanced mapping technologies to create
-                detailed road plans that meet both regulatory requirements and
-                client specifications.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 3 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>House Plans</h3>
-              <i class="fas fa-home"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We create detailed and code-compliant house plans tailored to
-                your specific needs, preferences, and budget.
-              </p>
-              <p>
-                Our designs incorporate modern architectural principles while
-                ensuring structural integrity and optimal space utilization.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Environmental Section -->
-      <section class="service-category" id="environmental">
-        <h2 class="category-heading">
-          <i class="fas fa-leaf"></i> Environmental Consultancy
-        </h2>
-        <div class="services-grid">
-          <!-- Service Card 1 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Environmental Impact Assessment (EIA)</h3>
-              <i class="fas fa-search"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> Kinyarwanda</span
-                >
-              </div>
-              <p>
-                We conduct comprehensive Environmental Impact Assessments for
-                development projects, ensuring compliance with local and
-                international standards.
-              </p>
-              <p>
-                Our assessments evaluate potential environmental effects,
-                propose mitigation measures, and facilitate sustainable project
-                implementation.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Technical Training Section -->
-      <section class="service-category" id="technical-training">
-        <h2 class="category-heading">
-          <i class="fas fa-graduation-cap"></i> Technical Training
-        </h2>
-        <div class="services-grid">
-          <!-- Service Card 1 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Surveying Equipment & Software</h3>
-              <i class="fas fa-tools"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-              </div>
-              <p>
-                We provide hands-on training for surveying equipment such as
-                Total Stations and software like AutoCAD and ArcGIS.
-              </p>
-              <p>
-                Our training programs are designed for professionals, students,
-                and organizations looking to enhance their technical
-                capabilities.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 2 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Python for Data Analysis</h3>
-              <i class="fab fa-python"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-              </div>
-              <p>
-                Learn data manipulation, visualization, and modeling using
-                Python programming language and its powerful libraries.
-              </p>
-              <p>
-                Our courses cover practical applications of Python in spatial
-                data analysis, suitable for both beginners and experienced
-                programmers.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 3 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>GIS & Remote Sensing</h3>
-              <i class="fas fa-satellite"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-              </div>
-              <p>
-                Master Geographic Information Systems (GIS) and Remote Sensing
-                techniques for advanced geospatial analysis.
-              </p>
-              <p>
-                Our training covers data collection, processing, analysis, and
-                visualization using industry-standard tools and methodologies.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 4 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Artificial Intelligence for Data Analysis</h3>
-              <i class="fas fa-brain"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-              </div>
-              <p>
-                Learn Machine Learning (ML) and Deep Learning (DL) techniques
-                applied to geospatial and surveying data analysis.
-              </p>
-              <p>
-                Our courses cover practical applications of AI in land use
-                classification, feature extraction, and predictive modeling.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Card 5 -->
-          <div class="service-card">
-            <div class="service-card-header">
-              <h3>Research Support Services</h3>
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="service-card-content">
-              <div class="service-languages">
-                <span class="language-tag"
-                  ><i class="fas fa-globe"></i> English</span
-                >
-              </div>
-              <p>
-                We provide comprehensive support for academic and professional
-                research projects related to surveying, mapping, and geospatial
-                analysis.
-              </p>
-              <p>
-                Our services include data collection, processing, statistical
-                analysis, and visualization to enhance the quality of research
-                outcomes.
-              </p>
-              <div class="service-cta">
-                <a href="#" class="btn-service">
-                  <i class="fas fa-info-circle"></i> Learn More
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <!-- Why Choose Us Section -->
       <section class="why-choose-us">
-        <h2>Why Choose Banner Fair Surveying & Mapping Ltd</h2>
+        <h2>Why Choose <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?></h2>
         <div class="advantages">
           <!-- Advantage 1 -->
           <div class="advantage-item">
@@ -500,7 +112,7 @@
               <h3>Licensed Professional</h3>
               <p>
                 Our lead surveyor holds official certification with Surveyor
-                code LS00280, ensuring all work meets legal standards.
+                code <?php echo getSetting('surveyor_code', 'LS00280'); ?>, ensuring all work meets legal standards.
               </p>
             </div>
           </div>
@@ -644,10 +256,10 @@
           expert solutions tailored to your needs.
         </p>
         <div class="cta-buttons">
-          <a href="#" class="btn-cta-primary">
+          <a href="contact.php" class="btn-cta-primary">
             <i class="fas fa-phone-alt"></i> Contact Us Today
           </a>
-          <a href="#" class="btn-cta-secondary">
+          <a href="contact.php" class="btn-cta-secondary">
             <i class="fas fa-calendar-alt"></i> Schedule a Consultation
           </a>
         </div>
@@ -733,4 +345,4 @@
       });
     </script>
   </body>
-</php>
+</html>

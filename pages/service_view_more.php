@@ -1,9 +1,65 @@
-<!DOCTYPE php>
-<php lang="en">
+<?php
+// Include database configuration
+require_once './config/database.php';
+
+// Get service slug from URL parameter
+$slug = isset($_GET['slug']) ? $_GET['slug'] : '';
+
+if (empty($slug)) {
+    header('Location: ./services.php');
+    exit();
+}
+
+// Fetch service from database
+$service = dbGetRow("SELECT * FROM services WHERE slug = ? AND status = 'active'", [$slug]);
+
+if (!$service) {
+    header('Location: ./services.php');
+    exit();
+}
+
+// Decode JSON fields
+$languages = json_decode($service['languages'], true) ?: [];
+$featuresData = json_decode($service['features'], true) ?: [];
+$gallery = json_decode($service['gallery'], true) ?: [];
+$processSteps = json_decode($service['process_steps'], true) ?: [];
+$benefits = json_decode($service['benefits'], true) ?: [];
+$requirements = json_decode($service['requirements'], true) ?: [];
+$faqs = json_decode($service['faqs'], true) ?: [];
+
+// Handle backward compatibility for features
+$features = [];
+if (!empty($featuresData)) {
+    // Check if it's the new format (array of objects) or old format (array of strings)
+    if (isset($featuresData[0]) && is_array($featuresData[0]) && isset($featuresData[0]['title'])) {
+        // New enhanced format
+        $features = $featuresData;
+    } else {
+        // Old simple format - convert to new format for display
+        foreach ($featuresData as $feature) {
+            if (is_string($feature)) {
+                $features[] = [
+                    'title' => $feature,
+                    'description' => '',
+                    'icon' => 'fas fa-check-circle'
+                ];
+            }
+        }
+    }
+}
+
+// Fetch related services (same category or random)
+$relatedServices = dbGetRows("SELECT * FROM services WHERE slug != ? AND status = 'active' ORDER BY sort_order ASC, created_at DESC LIMIT 3", [$slug]);
+
+$companySettings = getCompanySettings();
+?>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>First Registration - Banner Fair Surveying & Mapping Ltd</title>
+    <title><?php echo htmlspecialchars($service['meta_title'] ?: $service['title']); ?> - <?php echo getSetting('company_name', 'Fair Surveying & Mapping Ltd'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($service['meta_description'] ?: $service['short_description'] ?: substr($service['description'], 0, 160)); ?>">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -146,6 +202,27 @@
       .cta-button:hover {
         background-color: #e67e22;
         transform: translateY(-2px);
+      }
+
+      .service-price-hero {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 10px 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        display: inline-block;
+      }
+
+      .service-duration-info {
+        background-color: var(--light-color);
+        padding: 20px;
+        border-radius: 4px;
+        margin: 20px 0;
+        border-left: 4px solid var(--accent-color);
+      }
+
+      .service-duration-info h3 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
       }
 
       /* Overview Section */
@@ -738,7 +815,7 @@
           <i class="fas fa-chevron-right"></i>
           <a href="./services.php">Services</a>
           <i class="fas fa-chevron-right"></i>
-          <span>First Registration</span>
+          <span><?php echo htmlspecialchars($service['title']); ?></span>
         </div>
       </div>
     </section>
@@ -747,23 +824,27 @@
     <section class="service-hero">
       <div class="container">
         <div class="service-hero-content">
-          <h1>First Registration Services</h1>
+          <h1><?php echo htmlspecialchars($service['title']); ?></h1>
+          <?php if (!empty($languages)): ?>
           <div class="language-tags">
-            <span class="language-tag"
-              ><i class="fas fa-globe"></i> English</span
-            >
-            <span class="language-tag"
-              ><i class="fas fa-globe"></i> Kinyarwanda</span
-            >
+            <?php foreach ($languages as $language): ?>
+            <span class="language-tag">
+              <i class="fas fa-globe"></i> <?php echo htmlspecialchars($language); ?>
+            </span>
+            <?php endforeach; ?>
           </div>
+          <?php endif; ?>
           <p>
-            Comprehensive first-time registration services for land parcels,
-            ensuring accurate measurements and legal documentation for your
-            property.
+            <?php echo htmlspecialchars($service['short_description'] ?: substr($service['description'], 0, 200) . '...'); ?>
           </p>
-          <a href="./contact.php" class="cta-button"
-            ><i class="fas fa-phone-alt"></i> Request a Consultation</a
-          >
+          <?php if (!empty($service['price']) && $service['price'] > 0): ?>
+          <div class="service-price-hero">
+            <strong>Price: <?php echo formatPrice($service['price']); ?></strong>
+          </div>
+          <?php endif; ?>
+          <a href="./contact.php" class="cta-button">
+            <i class="fas fa-phone-alt"></i> Request a Consultation
+          </a>
         </div>
       </div>
     </section>
@@ -772,56 +853,38 @@
     <section class="service-overview">
       <div class="container">
         <h2 class="section-title">Service Overview</h2>
-        <p>
-          First Registration is the process of officially recording a property
-          with the land registry for the first time. Our expert team will guide
-          you through every step of this important process, ensuring that your
-          property is properly surveyed, documented, and legally registered.
+        <p style="text-align: center;">
+          <?php echo nl2br(htmlspecialchars($service['description'])); ?>
         </p>
-
-        <div class="overview-grid">
-          <div class="overview-card">
-            <div class="overview-card-icon">
-              <i class="fas fa-ruler-combined"></i>
-            </div>
-            <div class="overview-card-content">
-              <h3>Accurate Surveying</h3>
-              <p>
-                We use state-of-the-art equipment and professional techniques to
-                ensure precise measurements of your land parcel, helping to
-                avoid future boundary disputes.
-              </p>
-            </div>
-          </div>
-
-          <div class="overview-card">
-            <div class="overview-card-icon">
-              <i class="fas fa-file-signature"></i>
-            </div>
-            <div class="overview-card-content">
-              <h3>Legal Documentation</h3>
-              <p>
-                Our team prepares all necessary legal documents required by land
-                registration authorities, ensuring compliance with all relevant
-                laws and regulations.
-              </p>
-            </div>
-          </div>
-
-          <div class="overview-card">
-            <div class="overview-card-icon">
-              <i class="fas fa-hands-helping"></i>
-            </div>
-            <div class="overview-card-content">
-              <h3>End-to-End Support</h3>
-              <p>
-                We provide comprehensive support throughout the entire
-                registration process, from initial consultation to final
-                registration certificate.
-              </p>
-            </div>
-          </div>
+        
+        <?php if (!empty($service['duration'])): ?>
+        <div class="service-duration-info">
+          <h3><i class="fas fa-clock"></i> Duration</h3>
+          <p><?php echo htmlspecialchars($service['duration']); ?></p>
         </div>
+        <?php endif; ?>
+
+        <?php if (!empty($features)): ?>
+        <div class="overview-grid">
+          <?php foreach (array_slice($features, 0, 6) as $index => $feature): ?>
+          <div class="overview-card">
+            <div class="overview-card-icon">
+              <i class="<?php echo htmlspecialchars($feature['icon'] ?: 'fas fa-check-circle'); ?>"></i>
+            </div>
+            <div class="overview-card-content">
+              <h3><?php echo htmlspecialchars($feature['title']); ?></h3>
+              <p>
+                <?php 
+                echo htmlspecialchars($feature['description'] ?: 
+                  'Professional service feature ensuring quality and reliability in our ' . strtolower($service['title']) . ' offerings.'
+                ); 
+                ?>
+              </p>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
       </div>
     </section>
 
@@ -829,56 +892,53 @@
     <section class="service-process">
       <div class="container">
         <h2 class="section-title">Our Process</h2>
-        <p>
-          We follow a systematic approach to ensure your first registration is
+        <p style="text-align: center;">
+          We follow a systematic approach to ensure your <?php echo strtolower($service['title']); ?> service is
           completed efficiently and accurately.
         </p>
 
         <div class="process-steps">
-          <div class="process-step">
-            <div class="step-number">1</div>
-            <div class="step-title">Initial Consultation</div>
-            <div class="step-description">
-              We meet with you to understand your property needs and gather
-              initial information.
+          <?php if (!empty($processSteps)): ?>
+            <?php foreach ($processSteps as $step): ?>
+            <div class="process-step">
+              <div class="step-number"><?php echo htmlspecialchars($step['step']); ?></div>
+              <div class="step-title"><?php echo htmlspecialchars($step['title']); ?></div>
+              <div class="step-description">
+                <?php echo htmlspecialchars($step['description']); ?>
+              </div>
             </div>
-          </div>
-
-          <div class="process-step">
-            <div class="step-number">2</div>
-            <div class="step-title">Property Survey</div>
-            <div class="step-description">
-              Our professional surveyors conduct a thorough assessment and
-              measurement of your land.
+            <?php endforeach; ?>
+          <?php else: ?>
+            <!-- Default process steps if none defined -->
+            <div class="process-step">
+              <div class="step-number">1</div>
+              <div class="step-title">Initial Consultation</div>
+              <div class="step-description">
+                We meet with you to understand your needs and gather initial information.
+              </div>
             </div>
-          </div>
-
-          <div class="process-step">
-            <div class="step-number">3</div>
-            <div class="step-title">Documentation</div>
-            <div class="step-description">
-              We prepare all necessary legal documents and application forms for
-              submission.
+            <div class="process-step">
+              <div class="step-number">2</div>
+              <div class="step-title">Assessment</div>
+              <div class="step-description">
+                Our professional team conducts a thorough assessment of your requirements.
+              </div>
             </div>
-          </div>
-
-          <div class="process-step">
-            <div class="step-number">4</div>
-            <div class="step-title">Registration</div>
-            <div class="step-description">
-              We submit your application to the land registry and monitor its
-              progress.
+            <div class="process-step">
+              <div class="step-number">3</div>
+              <div class="step-title">Implementation</div>
+              <div class="step-description">
+                We implement the service according to professional standards and best practices.
+              </div>
             </div>
-          </div>
-
-          <div class="process-step">
-            <div class="step-number">5</div>
-            <div class="step-title">Certificate Issuance</div>
-            <div class="step-description">
-              Once approved, we help you obtain your official registration
-              certificate.
+            <div class="process-step">
+              <div class="step-number">4</div>
+              <div class="step-title">Completion</div>
+              <div class="step-description">
+                We deliver the completed service and provide all necessary documentation.
+              </div>
             </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -886,90 +946,66 @@
     <!-- Benefits Section -->
     <section class="service-benefits">
       <div class="container">
-        <h2 class="section-title">Benefits of First Registration</h2>
-        <p>
-          Properly registering your land offers numerous advantages that protect
-          your investment and provide peace of mind.
+        <h2 class="section-title">Benefits of <?php echo htmlspecialchars($service['title']); ?></h2>
+        <p style="text-align: center;">
+          Our <?php echo strtolower($service['title']); ?> service offers numerous advantages that provide
+          value and peace of mind for our clients.
         </p>
 
         <div class="benefits-list">
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-shield-alt"></i>
+          <?php if (!empty($benefits)): ?>
+            <?php foreach ($benefits as $benefit): ?>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="<?php echo htmlspecialchars($benefit['icon'] ?: 'fas fa-check-circle'); ?>"></i>
+              </div>
+              <div class="benefit-content">
+                <h3><?php echo htmlspecialchars($benefit['title']); ?></h3>
+                <p>
+                  <?php echo htmlspecialchars($benefit['description']); ?>
+                </p>
+              </div>
             </div>
-            <div class="benefit-content">
-              <h3>Legal Protection</h3>
-              <p>
-                Official registration provides legal recognition of your
-                ownership rights, protecting you from potential disputes.
-              </p>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <!-- Default benefits if none defined -->
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="benefit-content">
+                <h3>Professional Service</h3>
+                <p>
+                  Our experienced team provides professional and reliable service
+                  that meets industry standards and client expectations.
+                </p>
+              </div>
             </div>
-          </div>
-
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-money-bill-wave"></i>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="benefit-content">
+                <h3>Timely Delivery</h3>
+                <p>
+                  We complete projects within agreed timeframes, ensuring your
+                  schedule and deadlines are met efficiently.
+                </p>
+              </div>
             </div>
-            <div class="benefit-content">
-              <h3>Property Value</h3>
-              <p>
-                Registered properties typically have higher market values and
-                are more attractive to potential buyers.
-              </p>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-thumbs-up"></i>
+              </div>
+              <div class="benefit-content">
+                <h3>Quality Assurance</h3>
+                <p>
+                  All our work is backed by quality assurance processes and
+                  professional guarantees for your peace of mind.
+                </p>
+              </div>
             </div>
-          </div>
-
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-landmark"></i>
-            </div>
-            <div class="benefit-content">
-              <h3>Financial Access</h3>
-              <p>
-                Registered land can be used as collateral for loans, improving
-                your access to financial resources.
-              </p>
-            </div>
-          </div>
-
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-exchange-alt"></i>
-            </div>
-            <div class="benefit-content">
-              <h3>Ease of Transfer</h3>
-              <p>
-                Properly registered land simplifies future property transfers,
-                sales, or inheritance processes.
-              </p>
-            </div>
-          </div>
-
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-gavel"></i>
-            </div>
-            <div class="benefit-content">
-              <h3>Dispute Prevention</h3>
-              <p>
-                Clear boundaries and official documentation minimize the risk of
-                boundary disputes with neighbors.
-              </p>
-            </div>
-          </div>
-
-          <div class="benefit-item">
-            <div class="benefit-icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="benefit-content">
-              <h3>Development Opportunities</h3>
-              <p>
-                Registered land creates opportunities for development projects
-                and investments on your property.
-              </p>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -977,34 +1013,45 @@
     <!-- Requirements Section -->
     <section class="service-requirements">
       <div class="container">
-        <h2 class="section-title">Requirements for First Registration</h2>
-        <p>
-          To initiate the first registration process, you'll need to provide
+        <h2 class="section-title">Requirements for <?php echo htmlspecialchars($service['title']); ?></h2>
+        <p style="text-align: center;">
+          To proceed with our <?php echo strtolower($service['title']); ?> service, you'll need to provide
           certain documents and meet specific requirements.
         </p>
 
         <div class="requirements-container">
-          <div class="requirements-list">
-            <h3>Required Documents</h3>
-            <ul>
-              <li>Identity documents (National ID, passport)</li>
-              <li>
-                Proof of ownership (purchase agreement, inheritance documents)
-              </li>
-              <li>Land acquisition documents</li>
-              <li>Tax clearance certificate</li>
-              <li>Existing plot plans or sketches (if available)</li>
-              <li>Power of attorney (if acting on behalf of owner)</li>
-              <li>Passport-sized photographs</li>
-            </ul>
-          </div>
+          <?php if (!empty($requirements)): ?>
+            <?php foreach ($requirements as $requirement): ?>
+            <div class="requirements-list">
+              <h3><?php echo htmlspecialchars($requirement['category']); ?></h3>
+              <ul>
+                <?php foreach ($requirement['items'] as $item): ?>
+                <li><?php echo htmlspecialchars($item); ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <!-- Default requirements if none defined -->
+            <div class="requirements-list">
+              <h3>General Requirements</h3>
+              <ul>
+                <li>Valid identification documents</li>
+                <li>Relevant project or property documentation</li>
+                <li>Contact information and availability for consultation</li>
+                <li>Clear project specifications and requirements</li>
+              </ul>
+            </div>
+          <?php endif; ?>
 
+          <?php if (!empty($service['image'])): ?>
           <div class="requirements-image">
             <img
-              src="../images/9c_NLZ75_JAwFH7mjiGB_.jpg"
-              alt="Land Registration Documents"
+              src="<?php echo getFileUrl($service['image']); ?>"
+              alt="<?php echo htmlspecialchars($service['title']); ?> Requirements"
             />
           </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -1013,126 +1060,70 @@
     <section class="service-faq">
       <div class="container">
         <h2 class="section-title">Frequently Asked Questions</h2>
-        <p>
-          Here are answers to some common questions about the first registration
-          process.
+        <p style="text-align: center;">
+          Here are answers to some common questions about our <?php echo strtolower($service['title']); ?>
+          service.
         </p>
 
         <div class="faq-container">
-          <div class="faq-item">
-            <div class="faq-question">
-              <span>How long does the first registration process take?</span>
-              <i class="fas fa-chevron-down faq-toggle"></i>
+          <?php if (!empty($faqs)): ?>
+            <?php foreach ($faqs as $faq): ?>
+            <div class="faq-item">
+              <div class="faq-question">
+                <span><?php echo htmlspecialchars($faq['question']); ?></span>
+                <i class="fas fa-chevron-down faq-toggle"></i>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  <?php echo nl2br(htmlspecialchars($faq['answer'])); ?>
+                </p>
+              </div>
             </div>
-            <div class="faq-answer">
-              <p>
-                The duration of the first registration process can vary
-                depending on several factors, including the complexity of the
-                property, the completeness of your documentation, and the
-                current workload of the land registry office. Typically, the
-                process takes between 4-8 weeks from the initial survey to the
-                issuance of the registration certificate. Our team works
-                diligently to expedite the process wherever possible.
-              </p>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <!-- Default FAQs if none defined -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <span>How long does the service take?</span>
+                <i class="fas fa-chevron-down faq-toggle"></i>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  The duration varies depending on the complexity and scope of the project. 
+                  We provide estimated timelines during the initial consultation and keep 
+                  you updated throughout the process.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div class="faq-item">
-            <div class="faq-question">
-              <span>What is the cost of first registration services?</span>
-              <i class="fas fa-chevron-down faq-toggle"></i>
+            <div class="faq-item">
+              <div class="faq-question">
+                <span>What is the cost of this service?</span>
+                <i class="fas fa-chevron-down faq-toggle"></i>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Costs vary based on project requirements and complexity. We provide 
+                  detailed quotes after the initial consultation, with transparent 
+                  pricing and no hidden charges.
+                </p>
+              </div>
             </div>
-            <div class="faq-answer">
-              <p>
-                The cost of first registration services varies based on the size
-                and location of your property, as well as the complexity of the
-                registration process. We provide a detailed quote after the
-                initial consultation, which includes all survey costs,
-                documentation preparation, and registration fees. We believe in
-                transparent pricing with no hidden charges, and we offer
-                competitive rates in the market.
-              </p>
-            </div>
-          </div>
 
-          <div class="faq-item">
-            <div class="faq-question">
-              <span>Do I need to be present during the property survey?</span>
-              <i class="fas fa-chevron-down faq-toggle"></i>
+            <div class="faq-item">
+              <div class="faq-question">
+                <span>Do you provide ongoing support?</span>
+                <i class="fas fa-chevron-down faq-toggle"></i>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Yes, we provide comprehensive support throughout the entire process 
+                  and offer post-completion assistance to ensure your satisfaction 
+                  with our services.
+                </p>
+              </div>
             </div>
-            <div class="faq-answer">
-              <p>
-                While it's not mandatory, we highly recommend that you or your
-                authorized representative be present during the property survey.
-                This allows you to point out any specific features or boundary
-                concerns and ensures that all parties are in agreement about the
-                property boundaries. If you cannot be present, we can proceed
-                with the survey based on the documentation provided, but your
-                presence helps minimize potential disputes later.
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-question">
-              <span>Can you help with disputed boundaries?</span>
-              <i class="fas fa-chevron-down faq-toggle"></i>
-            </div>
-            <div class="faq-answer">
-              <p>
-                Yes, we have extensive experience in resolving boundary
-                disputes. Our professional surveyors use precise measurement
-                techniques and historical records to determine accurate
-                boundaries. If disputes arise during the registration process,
-                we can facilitate mediation between neighbors and provide expert
-                testimony if needed. We always aim for amicable resolutions that
-                protect your interests while maintaining good neighborly
-                relations.
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-question">
-              <span
-                >What happens if there are issues with my documentation?</span
-              >
-              <i class="fas fa-chevron-down faq-toggle"></i>
-            </div>
-            <div class="faq-answer">
-              <p>
-                If we identify any issues with your documentation during the
-                registration process, our team will promptly notify you and
-                provide guidance on how to address them. This might involve
-                obtaining additional documents, correcting inconsistencies, or
-                clarifying information with relevant authorities. We have
-                relationships with various government offices and can often
-                expedite the resolution of documentation issues to keep your
-                registration process moving forward.
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <div class="faq-question">
-              <span
-                >Can you handle registration for different types of
-                properties?</span
-              >
-              <i class="fas fa-chevron-down faq-toggle"></i>
-            </div>
-            <div class="faq-answer">
-              <p>
-                Yes, our team is experienced in handling first registration for
-                various types of properties, including residential plots,
-                commercial land, agricultural land, and special purpose
-                properties. Each type of property may have specific requirements
-                and regulations, which our experts are familiar with. We
-                customize our approach based on the property type to ensure
-                compliance with all relevant laws and regulations.
-              </p>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -1141,7 +1132,7 @@
     <section class="contact-form-section" id="contact-form">
       <div class="container">
         <h2 class="section-title">Get in Touch</h2>
-        <p>
+        <p style="text-align: center;">
           Fill out the form below, and one of our registration specialists will
           contact you within 24 hours.
         </p>
@@ -1228,7 +1219,7 @@
               </div>
               <div class="info-content">
                 <h3>Our Office</h3>
-                <p>123 KG Avenue, Kigali Business Center<br />Kigali, Rwanda</p>
+                <p><?php echo getSetting('company_address', 'Kigali, Rwanda'); ?></p>
               </div>
             </div>
 
@@ -1238,7 +1229,7 @@
               </div>
               <div class="info-content">
                 <h3>Phone</h3>
-                <p>+250 780 123 456<br />+250 725 789 012</p>
+                <p><?php echo getSetting('company_phone', '+250 788 331 697'); ?></p>
               </div>
             </div>
 
@@ -1248,7 +1239,7 @@
               </div>
               <div class="info-content">
                 <h3>Email</h3>
-                <p>info@bannerfair.com<br />registration@bannerfair.com</p>
+                <p><?php echo getSetting('company_email', 'fsamcompanyltd@gmail.com'); ?></p>
               </div>
             </div>
 
@@ -1273,68 +1264,43 @@
     <section class="related-services">
       <div class="container">
         <h2 class="section-title">Related Services</h2>
-        <p>
+        <p style="text-align: center;">
           Explore our other professional surveying and mapping services that
           might be of interest.
         </p>
 
         <div class="related-services-grid">
-          <div class="related-service-card">
-            <div class="related-service-image">
-              <img
-                src="../images/9c_NLZ75_JAwFH7mjiGB_.jpg"
-                alt="Boundary Survey"
-              />
+          <?php if (!empty($relatedServices)): ?>
+            <?php foreach ($relatedServices as $relatedService): ?>
+            <div class="related-service-card">
+              <div class="related-service-image">
+                <img
+                  src="<?php echo getFileUrl($relatedService['image']); ?>"
+                  alt="<?php echo htmlspecialchars($relatedService['title']); ?>"
+                />
+              </div>
+              <div class="related-service-content">
+                <h3><?php echo htmlspecialchars($relatedService['title']); ?></h3>
+                <p>
+                  <?php echo htmlspecialchars($relatedService['short_description'] ?: substr($relatedService['description'], 0, 100) . '...'); ?>
+                </p>
+                <a href="./service_view_more.php?slug=<?php echo urlencode($relatedService['slug']); ?>" class="service-link">
+                  Learn More <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
             </div>
-            <div class="related-service-content">
-              <h3>Boundary Surveys</h3>
-              <p>
-                Accurate determination and marking of property boundaries to
-                prevent disputes and ensure legal compliance.
-              </p>
-              <a href="boundary-surveys.php" class="service-link"
-                >Learn More <i class="fas fa-arrow-right"></i
-              ></a>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="related-service-card">
+              <div class="related-service-content">
+                <h3>More Services</h3>
+                <p>Explore our comprehensive range of surveying and mapping services.</p>
+                <a href="./services.php" class="service-link">
+                  View All Services <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
             </div>
-          </div>
-
-          <div class="related-service-card">
-            <div class="related-service-image">
-              <img
-                src="../images/9ymlPUvjUSWPlrk-qrJ2k.jpg"
-                alt="Topographic Survey"
-              />
-            </div>
-            <div class="related-service-content">
-              <h3>Topographic Surveys</h3>
-              <p>
-                Detailed mapping of land elevations and features for
-                construction planning and development projects.
-              </p>
-              <a href="topographic-surveys.php" class="service-link"
-                >Learn More <i class="fas fa-arrow-right"></i
-              ></a>
-            </div>
-          </div>
-
-          <div class="related-service-card">
-            <div class="related-service-image">
-              <img
-                src="../images/bhHQ2-XvUG3QKct5kwamE.jpg"
-                alt="Property Subdivision"
-              />
-            </div>
-            <div class="related-service-content">
-              <h3>Property Subdivision</h3>
-              <p>
-                Professional division of land into smaller parcels for
-                development or sale, with all necessary legal documentation.
-              </p>
-              <a href="property-subdivision.php" class="service-link"
-                >Learn More <i class="fas fa-arrow-right"></i
-              ></a>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
@@ -1363,4 +1329,4 @@
       });
     </script>
   </body>
-</php>
+</html>
