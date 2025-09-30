@@ -12,6 +12,7 @@
 
     <!-- Scripts -->
     <script src="assets/js/admin.js"></script>
+    <script src="assets/js/session_manager.js"></script>
     <?php if (isset($additionalJS)): ?>
         <?php foreach ($additionalJS as $js): ?>
             <script src="<?php echo $js; ?>"></script>

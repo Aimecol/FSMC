@@ -1,6 +1,10 @@
 <?php
+// Define access constant
+define('FSMC_ACCESS', true);
+
 // Include database configuration
 require_once './config/database.php';
+require_once '../config/email_config.php';
 
 // Handle contact form submission
 $formMessage = '';
@@ -25,6 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             throw new Exception('Please enter a valid email address.');
         }
         
+        // Prepare contact data for email
+        $contactData = [
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'subject' => $subject,
+            'service' => $serviceInterest,
+            'message' => $message,
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ];
+        
         // Insert into database
         $stmt = getDB()->query("
             INSERT INTO contact_messages (name, email, phone, subject, service_interest, message, ip_address, user_agent)
@@ -40,8 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_contact'])) {
             $_SERVER['HTTP_USER_AGENT'] ?? ''
         ]);
         
-        $formMessage = 'Your message has been sent successfully. We\'ll get back to you soon!';
-        $formMessageType = 'success';
+        // Send email notification using the ultimate method (tries everything)
+        $emailSent = sendContactEmailUltimate($contactData);
+        
+        if ($emailSent) {
+            $formMessage = 'Your message has been sent successfully! We\'ll get back to you within 24 hours.';
+            $formMessageType = 'success';
+        } else {
+            $formMessage = 'Your message has been saved successfully. We will review it and get back to you soon.';
+            $formMessageType = 'success'; // Still show success since message was saved
+            error_log('Contact form email failed for: ' . $email);
+        }
         
         // Clear form data on success
         $_POST = [];

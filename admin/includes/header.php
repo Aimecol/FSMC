@@ -57,9 +57,6 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                     <a href="profile.php" class="dropdown-item">
                         <i class="fas fa-user"></i> Profile
                     </a>
-                    <a href="settings.php" class="dropdown-item">
-                        <i class="fas fa-cog"></i> Settings
-                    </a>
                     <div class="dropdown-divider"></div>
                     <a href="logout.php?token=<?php echo generateCSRFToken(); ?>" class="dropdown-item">
                         <i class="fas fa-sign-out-alt"></i> Logout
